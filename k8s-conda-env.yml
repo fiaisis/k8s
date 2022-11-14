@@ -1,0 +1,11 @@
+name: k8s
+
+channels:
+  - conda-forge
+
+dependencies:
+  - ansible
+  - python-kubernetes
+  - minikube
+  - kubernetes
+  - kubernetes-helm
