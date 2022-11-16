@@ -15,6 +15,14 @@ Setup the VMs if they don't exist already
 - 3 application work nodes size c3.medium
 - 2 queue work nodes size l2.small
 
+Adding new nodes or changing the config
+---------------------------------------
+
+There are two places you need to change IP addresses:
+
+- k0sctl.yaml
+- ansible/inventory.yaml
+
 Using k0sctl to setup the kubernetes cluster
 --------------------------------------------
 
