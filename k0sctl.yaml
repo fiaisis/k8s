@@ -1,0 +1,81 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: k0s-cluster
+spec:
+  hosts:
+  - ssh:
+      address: 172.16.101.59
+      user: vxw59196
+      port: 22
+    role: controller
+  - ssh:
+      address: 172.16.101.84
+      user: vxw59196
+      port: 22
+    role: controller
+  - ssh:
+      address: 172.16.113.185
+      user: vxw59196
+      port: 22
+    role: worker
+  - ssh:
+      address: 172.16.112.99
+      user: vxw59196
+      port: 22
+    role: worker
+  - ssh:
+      address: 172.16.112.234
+      user: vxw59196
+      port: 22
+    role: worker
+  - ssh:
+      address: 172.16.101.214
+      user: vxw59196
+      port: 22
+    role: worker
+  - ssh:
+      address: 172.16.101.137
+      user: vxw59196
+      port: 22
+    role: worker
+  k0s:
+    version: 1.24.7+k0s.0
+    dynamicConfig: false
+    config:
+      apiVersion: k0s.k0sproject.io/v1beta1
+      kind: Cluster
+      metadata:
+        name: k0s
+      spec:
+        api:
+          k0sApiPort: 9443
+          port: 6443
+        installConfig:
+          users:
+            etcdUser: etcd
+            kineUser: kube-apiserver
+            konnectivityUser: konnectivity-server
+            kubeAPIserverUser: kube-apiserver
+            kubeSchedulerUser: kube-scheduler
+        konnectivity:
+          adminPort: 8133
+          agentPort: 8132
+        network:
+          kubeProxy:
+            disabled: false
+            mode: iptables
+          kuberouter:
+            autoMTU: true
+            mtu: 0
+            peerRouterASNs: ""
+            peerRouterIPs: ""
+          podCIDR: 10.244.0.0/16
+          provider: kuberouter
+          serviceCIDR: 10.96.0.0/12
+        podSecurityPolicy:
+          defaultPolicy: 00-k0s-privileged
+        storage:
+          type: etcd
+        telemetry:
+          enabled: true
