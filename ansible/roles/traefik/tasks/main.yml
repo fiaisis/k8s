@@ -1,0 +1,12 @@
+---
+- name: Deployment
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Install traefik
+      kubernetes.core.helm_repository:
+        name: traefik
+        namespace: traefik
+        create_namespace: true
+        chart_ref: traefik/traefik
+        state: present

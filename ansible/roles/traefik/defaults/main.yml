@@ -1,0 +1,12 @@
+---
+traefik_ports:
+  traefik:
+    port: 9000
+    protocol: TCP
+    expose: true # Should be set to false in production
+    exposedPort: 9000
+  traefik_admin:
+    port: 9001
+    protocol: TCP
+    expose: true # Should be set to false in production
+    exposedPort: 9001  
