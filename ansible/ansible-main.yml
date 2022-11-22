@@ -1,8 +1,0 @@
----
-- name: Deploy cluster requirements
-  hosts: localhost
-  roles:
-    - role: traefik
-      tags: ["traefik"]
-
-# - name: Deploy traefik with Helm
