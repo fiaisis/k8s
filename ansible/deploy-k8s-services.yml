@@ -2,11 +2,13 @@
 - name: Deploy cluster requirements
   hosts: localhost
   roles:
-    # - role: update-systems
-    #   tags: ["update"]
     - role: cilium
       tags: ["cilium"]
     # - role: metallb
     #   tags: ["metallb"]
     - role: traefik
       tags: ["traefik"]
+    - role: longhorn
+      tags: ["longhorn"]
+    # - role: prometheus
+    #   tags: ["prometheus"]
