@@ -1,0 +1,25 @@
+---
+- name: Deployment
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Add cilium repository
+      kubernetes.core.helm_repository:
+        repo_name: cilium
+        repo_url: https://helm.cilium.io/
+
+    - name: Install cilium
+      kubernetes.core.helm:
+        update_repo_cache: false
+        name: cilium
+        release_namespace: kube-system
+        chart_ref: cilium/cilium
+        release_values:
+          encryption:
+            enabled: true
+            type: wireguard
+          hubble:
+            relay:
+              enabled: true
+            ui:
+              enabled: true
