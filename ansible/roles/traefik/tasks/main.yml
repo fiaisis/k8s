@@ -3,10 +3,25 @@
   delegate_to: localhost
   run_once: true
   block:
-    - name: Install traefik
+    - name: Add traefik repository
       kubernetes.core.helm_repository:
+        repo_name: traefik
+        repo_url: https://traefik.github.io/charts/
+
+    - name: Install traefik
+      kubernetes.core.helm:
+        update_repo_cache: false
         name: traefik
-        namespace: traefik
+        release_namespace: traefik
         create_namespace: true
         chart_ref: traefik/traefik
-        state: present
+        release_values:
+          logs:
+            general:
+              level: INFO
+          ports:
+            traefik:
+              port: 9000
+              protocol: TCP
+              expose: true # Should be set to false in production
+              exposedPort: 9000
