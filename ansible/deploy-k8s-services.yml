@@ -1,6 +1,8 @@
 ---
 - name: Deploy cluster requirements
   hosts: localhost
+  vars_files:
+    - group_vars/all/vault.yml
   roles:
     - role: cilium
       tags: ["cilium"]
@@ -10,5 +12,5 @@
       tags: ["traefik"]
     - role: longhorn
       tags: ["longhorn"]
-    # - role: prometheus
-    #   tags: ["prometheus"]
+    - role: prometheus
+      tags: ["prometheus"]
