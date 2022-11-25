@@ -15,6 +15,7 @@
         release_namespace: kube-system
         chart_ref: cilium/cilium
         release_values:
+          l7Proxy: false
           encryption:
             enabled: true
             type: wireguard
