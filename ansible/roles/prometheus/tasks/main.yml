@@ -16,12 +16,10 @@
         create_namespace: true
         chart_ref: prometheus-community/prometheus
         chart_version: 17.0.0
-        release_values:
+        release_values: # available values: https://github.com/prometheus-community/helm-charts/blob/prometheus-17.0.0/charts/prometheus/values.yaml
           alertmanager:
             enabled: false
-          nodeExporter:
-            enabled: true
-          pushgateway:
+          prometheus-pushgateway:
             enabled: false
           server:
             persistentVolume:

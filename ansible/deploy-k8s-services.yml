@@ -10,5 +10,5 @@
       tags: ["traefik"]
     - role: longhorn
       tags: ["longhorn"]
-    # - role: prometheus
-    #   tags: ["prometheus"]
+    - role: prometheus
+      tags: ["prometheus"]
