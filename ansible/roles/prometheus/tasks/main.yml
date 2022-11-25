@@ -36,4 +36,9 @@
                       - __name__
                     regex: "up|node_(cpu.*|disk.*|filesystem.*|hwmon.*|load.*|memory.*|network.*|pressure.*)"
                     action: keep
+                  - source_labels:
+                      - __name__
+                      - device
+                    regex: "node_network.*;veth.*"
+                    action: drop
         state: present

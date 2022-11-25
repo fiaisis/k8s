@@ -12,3 +12,5 @@
       tags: ["longhorn"]
     - role: prometheus
       tags: ["prometheus"]
+    - role: promtail
+      tags: ["promtail"]
