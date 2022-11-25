@@ -6,11 +6,9 @@
   roles:
     - role: cilium
       tags: ["cilium"]
-    # - role: metallb
-    #   tags: ["metallb"]
     - role: traefik
       tags: ["traefik"]
     - role: longhorn
       tags: ["longhorn"]
-    - role: prometheus
-      tags: ["prometheus"]
+    # - role: prometheus
+    #   tags: ["prometheus"]
