@@ -11,6 +11,7 @@ Requirements:
 
 Conda env setup
 ---------------
+
 To create a conda environment that can sustain development of this repository (excluding k0sctl and setup of k0s itself) you can run the following command, whilst in the repository:
 
 ```shell
@@ -18,7 +19,7 @@ conda env create -f k8s-conda-env.yml
 ```
 
 Recommended installs:
-------------
+---------------------
 
 After installing the conda env, activate it and install this plugin to helm.
 
@@ -26,8 +27,8 @@ After installing the conda env, activate it and install this plugin to helm.
 helm plugin install https://github.com/databus23/helm-diff
 ```
 
-Cloud setup:
-----------
+Cloud setup and deploy k0s via k0sctl in terraform:
+---------------------------------------------------
 Setup the VMs if they don't exist already
 
 - 2 control nodes size c3.small
@@ -40,53 +41,54 @@ Create a load balancer for TCP forwarding to the 3 controllers. To achieve this 
 - 8132 (for Konnectivity)
 - 9443 (for controller join API)
 
-Adding new nodes or changing the config
----------------------------------------
+You can achieve this by using terraform (included in the conda environment) from inside the terraform directory. `terraform apply` can fail due to cloud instability, if it does, just run it again.
 
-There are two places you need to change IP addresses:
+```shell
+terraform init
+terraform apply
+```
 
-- k0sctl.yaml
-- ansible/inventory.yaml
+Ensure that the `terraform/main.tf` file uses your FedId for the SSH Key name, and the key is up to date with yours.
 
-Using k0sctl to setup the kubernetes cluster
+Use terraform to output the data and then apply that to construct the k0s cluster.
+
+```shell
+terraform output -raw k0s_cluster | k0sctl apply --no-wait --config -
+```
+
+Using k0sctl to setup your local environment
 --------------------------------------------
 
-- Setup an ssh-agent for connecting to the cluster with k0sctl
+Setup an ssh-agent for connecting to the cluster with k0sctl
 
 ```shell
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_rsa
 ```
 
-- Ensure that the k0sctl.yaml file uses your FedId for the user on each host
-- Run k0sctl apply with the config
+- Export the kubeconfig to the top of the repository, whilst in the terraform directory
 
 ```shell
-k0sctl apply --config k0sctl.yaml --no-wait
-```
-
-- Export the kubeconfig
-
-```shell
-k0sctl kubeconfig > kubeconfig
+terraform output -raw k0s_cluster | k0sctl kubeconfig --config - > ../kubeconfig
 ```
 
 - Export KUBECONFIG
 
 ```shell
-export KUBECONFIG=/path/to/kubeconfig
+export KUBECONFIG=/path/to/repository/kubeconfig
 ```
 
 Add the k8s componenets needed for IR
 -------------------------------------
 
-Navigate to the ansible playbook directory and run the playbook for deploying K8s tools such as Traefik, Cilium etc.
+Navigate to the ansible playbook directory and run the playbook for deploying K8s tools such as Traefik, Cilium, Longhorn, Prometheus etc.
 
 ```shell
-ansible-playbook deploy-k8s-services.yml 
+ansible-playbook deploy-k8s-services.yml --ask-vault-password
 ```
 
 Gotchas
 -------
 
-- Kube-proxy is turned off so that Cilium can handle networking for us with better performance, the great the Linux Kernel version the more functionality this can provide so we should be as up to date in terms of kernel as possible. Minimum versions are: v4.19.57, v5.1.16, v5.2.0 it's based on the socket-LB feature. Details [here](https://docs.cilium.io/en/v1.12/gettingstarted/kubeproxy-free/)
+- `terraform apply` struggles with creating all the openstack VMs, this happens when doing it manually and is not related to terraform, it is due to cloud instability.
+- `terraform destroy` struggles with the load balancer, you can help it along by deleting the load balancer manually in the GUI whilst running it.
