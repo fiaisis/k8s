@@ -1,2 +1,3 @@
 kubeconfig
 .terraform*
+inventory.ini
