@@ -1,0 +1,98 @@
+---
+- name: Allow ports
+  become: true
+  block:
+    # These ports are based on: https://docs.k0sproject.io/v1.25.4+k0s.0/networking/#required-ports-and-protocols 
+    # and https://docs.cilium.io/en/stable/operations/system_requirements/#firewall-rules
+    - name: Turn on the firewall for all ingress
+      community.general.ufw:
+        state: enabled
+        policy: reject
+        log: true
+        direction: incoming
+      retries: 10
+      delay: 1
+
+    - name: Allow SSH on all hosts
+      community.general.ufw:
+        rule: limit
+        port: 22
+        proto: tcp
+      retries: 10
+      delay: 1
+
+    - name: Allow TCP on all hosts
+      community.general.ufw:
+        rule: allow
+        proto: tcp
+        port: "{{ item }}"
+      loop:
+        - 4240
+        - 4244
+        - 4245
+        - 6060:6062
+        - 9879:9893
+        - 9962:9964
+      retries: 10
+      delay: 1
+    
+    - name: Allow UDP on all hosts
+      community.general.ufw:
+        rule: allow
+        proto: udp
+        port: "{{ item }}"
+      loop:
+        - 51871
+        - 8472
+      retries: 10
+      delay: 1
+
+    - name: Allow ICMP using iptables
+      iptables:
+        chain: INPUT
+        jump: ACCEPT
+        protocol: icmp
+        wait: 1
+
+    - name: Allow ingress tcp ports on controllers
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 2380
+        - 6443
+        - 9443
+        - 8132
+        - 2379
+        - 4240
+      retries: 10
+      delay: 1
+      when: "'controllers' in group_names"
+
+    - name: Allow ingress tcp ports on workers
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - 10250
+        - 8132
+        - 4240
+        - 2379
+        - 2380
+        - 9090
+        - 9100 
+        - 10249
+      retries: 10
+      delay: 1
+      when: "'workers' in group_names"
+
+    # Needed for it to be persistent post restarts
+    - name: Install `netfilter-persistent` && `iptables-persistent` packages
+      apt:
+        name: "{{item}}"
+        state: present
+      with_items:
+        - iptables-persistent
+        - netfilter-persistent
