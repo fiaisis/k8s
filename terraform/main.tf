@@ -15,7 +15,7 @@ variable "queue_worker_flavour" {
 }
 
 variable "controller_count" {
-    default = 3
+    default = 3 # Need to update to load balancer definitions below when this changes to include the extra ips as they are not dynamic
 }
 
 variable "app_worker_count" {
@@ -234,7 +234,7 @@ resource "openstack_lb_members_v2" "Kubernetes_API" {
 }
 
 ######################################################################################################
-# K0sctl output
+# output
 ######################################################################################################
 
 locals {
@@ -281,4 +281,15 @@ locals {
 
 output "k0s_cluster" {
   value = yamlencode(local.k0s_tmpl)
+}
+
+output "ansible_inventory" {
+  value = templatefile(
+    "${path.module}/templates/ansible-inventory.tftpl",
+    {
+        user = openstack_compute_keypair_v2.keypair.name,
+        controllers = openstack_compute_instance_v2.k0s-controllers.*.access_ip_v4,
+        workers = concat(openstack_compute_instance_v2.k0s-app-workers.*.access_ip_v4, openstack_compute_instance_v2.k0s-queue-workers.*.access_ip_v4)
+    }
+  )
 }

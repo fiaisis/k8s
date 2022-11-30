@@ -4,7 +4,7 @@ Requirements:
 -------------
 
 - [Install k0sctl](https://github.com/k0sproject/k0sctl#installation)
-- Access to the STFC cloud openstack account
+- Access to the STFC cloud via an openstack account, with [setup environment variables](https://stfc-cloud-docs.readthedocs.io/en/latest/howto/CreateVMFromCommandLine.html#setting-up-the-environment-to-select-project) on the terminal of choice.
 - Install conda (recommend mambaforge) for managing the k8s repo or install python-kubernetes, ansible, and all of the kubernetes management software (kubernetes-client, kuberentes-server, etc) into your system/distro.
 - [Install Cilium CLI](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/#install-the-cilium-cli)
 - [Install hubble Client](https://docs.cilium.io/en/v1.10/gettingstarted/hubble_setup/#install-the-hubble-client)
@@ -29,26 +29,22 @@ helm plugin install https://github.com/databus23/helm-diff
 
 Cloud setup and deploy k0s via k0sctl in terraform:
 ---------------------------------------------------
-Setup the VMs if they don't exist already
 
-- 2 control nodes size c3.small
-- 3 application work nodes size c3.medium
-- 2 queue work nodes size l2.small
+You can achieve this by using terraform (included in the conda environment) from inside the terraform directory. `terraform apply` can fail due to cloud instability, if it does, just run it again. You need to have setup the environment variables for openstack listed in the requirements at the top of this file.
 
-Create a load balancer for TCP forwarding to the 3 controllers. To achieve this you will need to forward all traffic from these ports:
-
-- 6443 (for Kubernetes API)
-- 8132 (for Konnectivity)
-- 9443 (for controller join API)
-
-You can achieve this by using terraform (included in the conda environment) from inside the terraform directory. `terraform apply` can fail due to cloud instability, if it does, just run it again.
+Ensure that the `terraform/main.tf` file uses your FedId for the SSH Key name, and the key is up to date with yours.
 
 ```shell
 terraform init
 terraform apply
 ```
 
-Ensure that the `terraform/main.tf` file uses your FedId for the SSH Key name, and the key is up to date with yours.
+Setup an ssh-agent for connecting to the cluster with k0sctl. Example:
+
+```shell
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_rsa
+```
 
 Use terraform to output the data and then apply that to construct the k0s cluster.
 
@@ -56,20 +52,19 @@ Use terraform to output the data and then apply that to construct the k0s cluste
 terraform output -raw k0s_cluster | k0sctl apply --no-wait --config -
 ```
 
-Using k0sctl to setup your local environment
+Using terraform output to help setup dev env
 --------------------------------------------
-
-Setup an ssh-agent for connecting to the cluster with k0sctl
-
-```shell
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/id_rsa
-```
 
 - Export the kubeconfig to the top of the repository, whilst in the terraform directory
 
 ```shell
 terraform output -raw k0s_cluster | k0sctl kubeconfig --config - > ../kubeconfig
+```
+
+Use terraform to output the ansible inventory into your ansible directory
+
+```shell
+terraform output -raw ansible_inventory > ../ansible/inventory.ini
 ```
 
 - Export KUBECONFIG
