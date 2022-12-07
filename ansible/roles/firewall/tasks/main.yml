@@ -54,7 +54,7 @@
         protocol: icmp
         wait: 1
 
-    - name: Allow ingress tcp ports on controllers
+    - name: Allow ingress tcp ports on controllers and the load balancer
       community.general.ufw:
         rule: allow
         port: "{{ item }}"
@@ -66,9 +66,10 @@
         - 8132
         - 2379
         - 4240
+        - 9000
       retries: 10
       delay: 1
-      when: "'controllers' in group_names"
+      when: "'controllers' in group_names or 'loadbalancer' in group_names"
 
     - name: Allow ingress tcp ports on workers
       community.general.ufw:

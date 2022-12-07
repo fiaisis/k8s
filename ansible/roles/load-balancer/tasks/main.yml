@@ -1,0 +1,22 @@
+---
+- name: Install and configure HAProxy
+  become: true
+  block:
+    - name: Install `HAProxy`
+      apt:
+        name: "haproxy"
+        state: present
+      when: "'loadbalancer' in group_names"
+
+    - name: Copy HAProxy config file
+      template:
+        src: haproxy.cfg
+        dest: /etc/haproxy/haproxy.cfg
+      when: "'loadbalancer' in group_names"
+
+    - name: "starting haproxy services"
+      service:
+        name: "haproxy"
+        state: restarted
+        enabled: true
+      when: "'loadbalancer' in group_names"

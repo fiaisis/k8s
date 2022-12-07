@@ -1,10 +1,9 @@
 ---
-- name: Deploy cluster requirements
-  hosts: all
+- name: Deploy cluster components post k0s-deployment
+  hosts: localhost
   vars_files:
-    - group_vars/all/vault.yml
+    - vars/vault.yml
   roles:
-    - role: firewall
     - role: cilium
     - role: traefik
     - role: longhorn

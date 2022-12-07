@@ -7,3 +7,6 @@ ${ip} ansible_host=${ip} ansible_user=${user}
 %{ for hostname, ip in workers ~}
 ${ip} ansible_host=${ip} ansible_user=${user}
 %{ endfor ~}
+
+[loadbalancer]
+${load-balancer} ansible_host=${load-balancer} ansible_user=${user}

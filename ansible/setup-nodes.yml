@@ -1,0 +1,5 @@
+- name: Setup the nodes with their pre-k0s deployment requirements
+  hosts: all
+  roles:
+    - role: load-balancer
+    - role: firewall

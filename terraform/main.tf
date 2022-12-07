@@ -2,6 +2,7 @@ variable "image" {
     default = "ubuntu-focal-20.04-nogui"
 }
 
+# Used by the load balancer too
 variable "controller_flavour" {
     default = "c3.medium"
 }
@@ -70,167 +71,12 @@ resource "openstack_compute_instance_v2" "k0s-queue-workers" {
   count = var.queue_worker_count
 }
 
-######################################################################################################
-# Load balancer
-######################################################################################################
-
-resource "openstack_lb_loadbalancer_v2" "k0s-load-balancer" {
+resource "openstack_compute_instance_v2" "k0s-load-balancer" {
     name = "k0s-load-balancer"
-    vip_subnet_id = "78c7fbcc-b76e-4ff3-8e56-e979209032cc"
-    admin_state_up = "true"
-}
-
-# Konnectivity listener + pool + monitor + members
-# ----------------------------------------------------------------------------------------------------
-
-resource "openstack_lb_listener_v2" "Konnectivity" {
-    name = "Konnectivity"
-    protocol = "TCP"
-    protocol_port = 8132
-    loadbalancer_id = openstack_lb_loadbalancer_v2.k0s-load-balancer.id
-}
-
-resource "openstack_lb_pool_v2" "Konnectivity" {
-    name            = "Konnectivity"
-    protocol        = "TCP"
-    lb_method       = "SOURCE_IP"
-    listener_id = openstack_lb_listener_v2.Konnectivity.id
-
-    persistence {
-        type = "SOURCE_IP"
-    }
-}
-
-resource "openstack_lb_monitor_v2" "Konnectivity" {
-    pool_id     = openstack_lb_pool_v2.Konnectivity.id
-    type        = "TCP"
-    delay       = 20
-    timeout     = 10
-    max_retries = 5
-}
-
-resource "openstack_lb_members_v2" "Konnectivity" {
-    pool_id = openstack_lb_pool_v2.Konnectivity.id
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[0].name
-        address = openstack_compute_instance_v2.k0s-controllers[0].access_ip_v4
-        protocol_port = 8132
-    }
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[1].name
-        address = openstack_compute_instance_v2.k0s-controllers[1].access_ip_v4
-        protocol_port = 8132
-    }
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[2].name
-        address = openstack_compute_instance_v2.k0s-controllers[2].access_ip_v4
-        protocol_port = 8132
-    }
-}
-
-# Controller join API listener + pool + monitor + members
-# ----------------------------------------------------------------------------------------------------
-
-resource "openstack_lb_listener_v2" "Controller_join_API" {
-    name = "Controller join API"
-    protocol = "TCP"
-    protocol_port = 9443
-    loadbalancer_id = openstack_lb_loadbalancer_v2.k0s-load-balancer.id
-}
-
-resource "openstack_lb_pool_v2" "Controller_join_API" {
-    name            = "Controller join API"
-    protocol        = "TCP"
-    lb_method       = "SOURCE_IP"
-    listener_id = openstack_lb_listener_v2.Controller_join_API.id
-
-    persistence {
-        type = "SOURCE_IP"
-    }
-}
-
-resource "openstack_lb_monitor_v2" "Controller_join_API" {
-    pool_id     = openstack_lb_pool_v2.Controller_join_API.id
-    type        = "TCP"
-    delay       = 20
-    timeout     = 10
-    max_retries = 5
-}
-
-resource "openstack_lb_members_v2" "Controller_join_API" {
-    pool_id = openstack_lb_pool_v2.Controller_join_API.id
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[0].name
-        address = openstack_compute_instance_v2.k0s-controllers[0].access_ip_v4
-        protocol_port = 9443
-    }
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[1].name
-        address = openstack_compute_instance_v2.k0s-controllers[1].access_ip_v4
-        protocol_port = 9443
-    }
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[2].name
-        address = openstack_compute_instance_v2.k0s-controllers[2].access_ip_v4
-        protocol_port = 9443
-    }
-}
-
-# Kubernetes API listener + pool + monitor + members
-# ----------------------------------------------------------------------------------------------------
-
-resource "openstack_lb_listener_v2" "Kubernetes_API" {
-    name = "Kubernetes API"
-    protocol = "TCP"
-    protocol_port = 6443
-    loadbalancer_id = openstack_lb_loadbalancer_v2.k0s-load-balancer.id
-}
-
-resource "openstack_lb_pool_v2" "Kubernetes_API" {
-    name            = "Kubernetes API"
-    protocol        = "TCP"
-    lb_method       = "SOURCE_IP"
-    listener_id = openstack_lb_listener_v2.Kubernetes_API.id
-
-    persistence {
-        type = "SOURCE_IP"
-    }
-}
-
-resource "openstack_lb_monitor_v2" "Kubernetes_API" {
-    pool_id     = openstack_lb_pool_v2.Kubernetes_API.id
-    type        = "TCP"
-    delay       = 20
-    timeout     = 10
-    max_retries = 5
-}
-
-resource "openstack_lb_members_v2" "Kubernetes_API" {
-    pool_id = openstack_lb_pool_v2.Kubernetes_API.id
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[0].name
-        address = openstack_compute_instance_v2.k0s-controllers[0].access_ip_v4
-        protocol_port = 6443
-    }
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[1].name
-        address = openstack_compute_instance_v2.k0s-controllers[1].access_ip_v4
-        protocol_port = 6443
-    }
-
-    member {
-        name = openstack_compute_instance_v2.k0s-controllers[2].name
-        address = openstack_compute_instance_v2.k0s-controllers[2].access_ip_v4
-        protocol_port = 6443
-    }
+    image_name = var.image
+    flavor_name = var.controller_flavour
+    key_pair = "${openstack_compute_keypair_v2.keypair.name}"
+    security_groups = var.security_groups
 }
 
 ######################################################################################################
@@ -266,8 +112,8 @@ locals {
                     }
                     spec = {
                         api = {
-                            externalAddress = openstack_lb_loadbalancer_v2.k0s-load-balancer.vip_address
-                            sans = openstack_lb_loadbalancer_v2.k0s-load-balancer.vip_address
+                            externalAddress = openstack_compute_instance_v2.k0s-load-balancer.access_ip_v4
+                            sans = openstack_compute_instance_v2.k0s-load-balancer.access_ip_v4
                         }
                         network = {
                             provider = "custom"
@@ -290,6 +136,18 @@ output "ansible_inventory" {
         user = openstack_compute_keypair_v2.keypair.name,
         controllers = openstack_compute_instance_v2.k0s-controllers.*.access_ip_v4,
         workers = concat(openstack_compute_instance_v2.k0s-app-workers.*.access_ip_v4, openstack_compute_instance_v2.k0s-queue-workers.*.access_ip_v4)
+        load-balancer = openstack_compute_instance_v2.k0s-load-balancer.access_ip_v4
     }
   )
+}
+
+output "haproxy_config" {
+    value = templatefile(
+        "${path.module}/templates/haproxy.tftpl",
+        {
+            controller1 = openstack_compute_instance_v2.k0s-controllers[0].access_ip_v4,
+            controller2 = openstack_compute_instance_v2.k0s-controllers[1].access_ip_v4,
+            controller3 = openstack_compute_instance_v2.k0s-controllers[2].access_ip_v4
+        }
+    )
 }

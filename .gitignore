@@ -1,3 +1,4 @@
 kubeconfig
 .terraform*
 inventory.ini
+haproxy.cfg

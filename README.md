@@ -46,44 +46,49 @@ eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/id_rsa
 ```
 
-Use terraform to output the data and then apply that to construct the k0s cluster.
-
-```shell
-terraform output -raw k0s_cluster | k0sctl apply --no-wait --config -
-```
-
-Using terraform output to help setup dev env
---------------------------------------------
-
-- Export the kubeconfig to the top of the repository, whilst in the terraform directory
-
-```shell
-terraform output -raw k0s_cluster | k0sctl kubeconfig --config - > ../kubeconfig
-```
-
 Use terraform to output the ansible inventory into your ansible directory
 
 ```shell
 terraform output -raw ansible_inventory > ../ansible/inventory.ini
 ```
 
-- Export KUBECONFIG
+Use terraform to output the haproxy.cfg
+
+```shell
+terraform output -raw haproxy_config > ../ansible/haproxy.cfg
+```
+
+Use ansible to activate the firewall and create the load balancer required for the k0s cluster (It is recommended to run these repeatedly until they execute with no errors):
+
+```shell
+cd ../ansible; ansible-playbook setup-nodes.yml; cd ../terraform
+```
+
+Use terraform to output the data and then apply that to construct the k0s cluster.
+
+```shell
+terraform output -raw k0s_cluster | k0sctl apply --no-wait --config -
+```
+
+Export the kubeconfig to the top of the repository, whilst in the terraform directory
+
+```shell
+terraform output -raw k0s_cluster | k0sctl kubeconfig --config - > ../kubeconfig
+```
+
+Export KUBECONFIG as an environment variable so that ansible can pick it up
 
 ```shell
 export KUBECONFIG=/path/to/repository/kubeconfig
 ```
 
-Add the k8s componenets needed for IR
--------------------------------------
-
-Navigate to the ansible playbook directory and run the playbook for deploying K8s tools such as Traefik, Cilium, Longhorn, Prometheus etc.
+Run the playbook for deploying K8s tools such as Traefik, Cilium, Longhorn, Prometheus, Promtail etc.
 
 ```shell
-ansible-playbook deploy-k8s-services.yml --ask-vault-password
+cd ../ansible; ansible-playbook deploy-k8s-services.yml --ask-vault-password ; cd ../terraform
 ```
 
 Gotchas
 -------
 
-- `terraform apply` struggles with creating all the openstack VMs, this happens when doing it manually and is not related to terraform, it is due to cloud instability.
-- `terraform destroy` struggles with the load balancer, you can help it along by deleting the load balancer manually in the GUI whilst running it.
+- `terraform apply` struggles with creating all the openstack VMs, this happens when doing it manually and is not related to terraform, it is due to cloud instability as far as we can tell.
