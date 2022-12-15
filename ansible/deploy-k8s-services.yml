@@ -9,3 +9,4 @@
     - role: longhorn
     - role: prometheus
     - role: promtail
+    - role: rundetection
