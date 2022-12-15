@@ -1,0 +1,89 @@
+---
+- name: Deployment of kafka
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Add strimzi repository
+      kubernetes.core.helm_repository:
+        repo_name: strimzi
+        repo_url: https://strimzi.io/charts/
+
+    - name: Install kafka
+      kubernetes.core.helm:
+        update_repo_cache: false
+        name: kafka
+        release_namespace: kafka
+        create_namespace: true
+        chart_ref: strimzi/strimzi-kafka-operator
+      
+    - name: Create a kafka cluster
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: kafka.strimzi.io/v1beta2
+          kind: Kafka
+          metadata:
+            name: kafka-cluster
+            namespace: kafka
+          spec:
+            kafka:
+              version: 3.3.1
+              replicas: 1
+              logging:
+                type: inline
+                loggers:
+                  kafka.root.logger.level: "INFO"
+              resources:
+                requests:
+                  memory: 4Gi
+                  cpu: "2"
+                limits:
+                  memory: 4Gi
+                  cpu: "2"
+              readinessProbe:
+                initialDelaySeconds: 15
+                timeoutSeconds: 5
+              livenessProbe:
+                initialDelaySeconds: 15
+                timeoutSeconds: 5
+              jvmOptions:
+                -Xms: 4096m
+                -Xmx: 4096m
+              listeners:
+                - name: plain
+                  port: 9092
+                  type: internal
+                  tls: false
+                  configuration:
+                    useServiceDnsDomain: true
+              authorization:
+                type: simple
+              config:
+                auto.create.topics.enable: "false"
+                offsets.topic.replication.factor: 1
+                transaction.state.log.replication.factor: 1
+                transaction.state.log.min.isr: 1
+                min.insync.replicas: 1
+                inter.broker.protocol.version: "3.3"
+              storage:
+                type: persistent-claim
+                size: 50Gi
+            zookeeper:
+              replicas: 1
+              logging:
+                type: inline
+                loggers: 
+                  zookeeper.root.logger: "INFO"
+              resources:
+                requests:
+                  memory: 2Gi
+                  cpu: "1"
+                limits:
+                  memory: 2Gi
+                  cpu: "1"
+              jvmOptions:
+                -Xms: 2048m
+                -Xmx: 2048m
+              storage:
+                type: persistent-claim
+                size: 25Gi
