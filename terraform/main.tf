@@ -8,7 +8,7 @@ variable "controller_flavour" {
 }
 
 variable "app_worker_flavour" {
-    default = "c3.medium"
+    default = "c1.xlarge"
 }
 
 variable "queue_worker_flavour" {
@@ -20,11 +20,11 @@ variable "controller_count" {
 }
 
 variable "app_worker_count" {
-    default = 3
+    default = 4
 }
 
 variable "queue_worker_count" {
-    default = 2
+    default = 3
 }
 
 variable "security_groups" {
