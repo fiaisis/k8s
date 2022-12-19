@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Pasarus
+  description: Mount the archive on the nodes
+  license: GPLv3
+
+  min_ansible_version: "5.0"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+
+dependencies: []

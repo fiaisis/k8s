@@ -1,0 +1,58 @@
+---
+- name: Mount the archive
+  become: true
+  block:
+    - name: Install cifs-utils and keyutils
+      apt:
+        name: "{{item}}"
+        state: present
+      with_items:
+        - cifs-utils
+        - keyutils
+      when: "'loadbalancer' not in group_names"
+    
+    - name: Create mountpoint
+      ansible.builtin.file:
+        path: /archive
+        state: directory
+        mode: "u=rwx,g=rx,o=rx"
+      when: "'loadbalancer' not in group_names"
+    
+    - name: Ensure credentials file is present
+      ansible.builtin.blockinfile:
+        path: /archive.creds
+        state: present
+        create: true
+        mode: "u=rwx,g=,o="
+        block: |
+          username={{ isis_archive.username }}
+          password={{ isis_archive.password }}
+          domain={{ isis_archive.domain }}
+      when: "'loadbalancer' not in group_names"
+    
+    - name: Ensure DNS config is setup for the archive
+      ansible.builtin.blockinfile:
+        path: /etc/systemd/resolved.conf
+        state: present
+        create: true
+        mode: "u=rw,g=r,o=r"
+        block: |
+          [Resolve]
+          Domains=isis.cclrc.ac.uk
+      when: "'loadbalancer' not in group_names"
+
+    - name: Restart resolved to ensure DNS configuration is up to date
+      ansible.builtin.service:
+        name: systemd-resolved.service
+        state: restarted
+      when: "'loadbalancer' not in group_names"
+    
+    - name: Ensure mount is configured
+      ansible.builtin.mount:
+        path: /archive
+        src: "//isis.cclrc.ac.uk/inst$/"
+        fstype: cifs
+        opts: "noserverino,vers=2.1,credentials=/archive.creds,_netdev"
+        state: mounted
+      retries: 10
+      when: "'loadbalancer' not in group_names"

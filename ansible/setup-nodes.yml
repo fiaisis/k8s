@@ -1,5 +1,8 @@
 - name: Setup the nodes with their pre-k0s deployment requirements
   hosts: all
+  vars_files:
+  - vars/vault.yml
   roles:
     - role: load-balancer
     - role: firewall
+    - role: isis-archive

@@ -61,7 +61,7 @@ terraform output -raw haproxy_config > ../ansible/haproxy.cfg
 Use ansible to activate the firewall and create the load balancer required for the k0s cluster (It is recommended to run these repeatedly until they execute with no errors):
 
 ```shell
-cd ../ansible; ansible-playbook setup-nodes.yml; cd ../terraform
+cd ../ansible; ansible-playbook setup-nodes.yml --ask-vault-password; cd ../terraform
 ```
 
 Use terraform to output the data and then apply that to construct the k0s cluster.

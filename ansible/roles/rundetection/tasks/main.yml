@@ -38,3 +38,10 @@
                     limits:
                       memory: "128Mi"
                       cpu: "500m"
+                  volumeMounts:
+                    - name: archive-mount
+                      mountPath: /archive
+              volumes:
+                - name: archive-mount
+                  hostPath:
+                    path: /archive
