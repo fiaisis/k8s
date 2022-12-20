@@ -20,11 +20,11 @@ variable "controller_count" {
 }
 
 variable "app_worker_count" {
-    default = 4
+    default = 5
 }
 
 variable "queue_worker_count" {
-    default = 3
+    default = 4
 }
 
 variable "security_groups" {
