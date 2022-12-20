@@ -30,10 +30,12 @@
               spec:
                 containers:
                 - name: rundetection
-                  image: ghcr.io/interactivereduction/rundetection:2022-12-14T15-10-16
+                  image: ghcr.io/interactivereduction/rundetection:on-k8s
                   env:
                   - name: ACTIVEMQ_IP
                     value: 172.16.100.197
+                  - name: KAFKA_IP
+                    value: kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local # Using the DNS service this will resolve to an actual IP address to the kafka service
                   resources:
                     limits:
                       memory: "128Mi"
@@ -41,7 +43,8 @@
                   volumeMounts:
                     - name: archive-mount
                       mountPath: /archive
-              volumes:
-                - name: archive-mount
-                  hostPath:
-                    path: /archive
+                volumes:
+                  - name: archive-mount
+                    hostPath:
+                      type: Directory
+                      path: /archive
