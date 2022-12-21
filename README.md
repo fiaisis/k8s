@@ -92,3 +92,14 @@ Gotchas
 -------
 
 - `terraform apply` struggles with creating all the openstack VMs, this happens when doing it manually and is not related to terraform, it is due to cloud instability as far as we can tell.
+
+Updating different parts of the cluster
+---------------------------------------
+
+In order to update the container versions on the cluster, for each of the containers that we produce, the following commands will be useful:
+
+RunDetection:
+
+```shell
+kubectl set image -n ir deployment/rundetection rundetection=ghcr.io/interactivereduction/rundetection:on-k8s --rolling-update
+```
