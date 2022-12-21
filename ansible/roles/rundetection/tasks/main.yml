@@ -13,38 +13,9 @@
     - name: Install rundetection
       kubernetes.core.k8s:
         state: present
-        definition:
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-            name: rundetection
-            namespace: ir
-          spec:
-            selector:
-              matchLabels:
-                app: rundetection
-            template:
-              metadata:
-                labels:
-                  app: rundetection
-              spec:
-                containers:
-                - name: rundetection
-                  image: ghcr.io/interactivereduction/rundetection:on-k8s
-                  env:
-                  - name: ACTIVEMQ_IP
-                    value: 172.16.100.197
-                  - name: KAFKA_IP
-                    value: kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local # Using the DNS service this will resolve to an actual IP address to the kafka service
-                  resources:
-                    limits:
-                      memory: "128Mi"
-                      cpu: "500m"
-                  volumeMounts:
-                    - name: archive-mount
-                      mountPath: /archive
-                volumes:
-                  - name: archive-mount
-                    hostPath:
-                      type: Directory
-                      path: /archive
+        src: files/rundetection.yml
+    
+    - name: Add kafka topic for rundetection
+      kubernetes.core.k8s:
+        state: present
+        src: files/kafka-cluster.yml
