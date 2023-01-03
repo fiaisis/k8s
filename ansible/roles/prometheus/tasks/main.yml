@@ -35,7 +35,7 @@
                 write_relabel_configs:
                   - source_labels:
                       - __name__
-                    regex: "up|node_(cpu.*|disk.*|filesystem.*|hwmon.*|load.*|memory.*|network.*|pressure.*)"
+                    regex: "{{ lookup('file', 'metrics-to-include.txt').strip().split('\n') | join('|') }}"
                     action: keep
                   - source_labels:
                       - __name__
