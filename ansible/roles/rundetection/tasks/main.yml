@@ -13,9 +13,9 @@
     - name: Install rundetection
       kubernetes.core.k8s:
         state: present
-        src: files/rundetection.yml
+        src: rundetection.yml
     
     - name: Add kafka topic for rundetection
       kubernetes.core.k8s:
         state: present
-        src: files/kafka-cluster.yml
+        src: kafka-topic.yml
