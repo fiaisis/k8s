@@ -8,7 +8,7 @@ variable "controller_flavour" {
 }
 
 variable "app_worker_flavour" {
-    default = "c1.xlarge"
+    default = "l2.tiny"
 }
 
 variable "queue_worker_flavour" {
