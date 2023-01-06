@@ -54,5 +54,5 @@
         fstype: cifs
         opts: "noserverino,vers=2.1,credentials=/archive.creds,_netdev"
         state: mounted
-      retries: 10
+      retries: 100
       when: "'loadbalancer' not in group_names"

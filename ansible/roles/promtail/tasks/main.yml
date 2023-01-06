@@ -23,4 +23,21 @@
                 basic_auth:
                   username: "{{ grafana_cloud_promtail.username }}"
                   password: "{{ grafana_cloud_promtail.token }}"
+          tolerations: [
+            {
+              "effect": "NoSchedule",
+              "key": "node-role.kubernetes.io/master",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoSchedule",
+              "key": "node-role.kubernetes.io/control-plane",
+              "operator": "Exists"
+            },
+            {
+              "effect": "NoSchedule",
+              "key": "queue-worker",
+              "operator": "Exists"
+            }
+          ]
         state: present

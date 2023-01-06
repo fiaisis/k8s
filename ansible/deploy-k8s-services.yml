@@ -4,6 +4,7 @@
   vars_files:
     - vars/vault.yml
   roles:
+    - role: taint-queue-nodes
     - role: cilium
     - role: traefik
     - role: longhorn

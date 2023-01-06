@@ -17,4 +17,14 @@
         create_namespace: true
         chart_ref: longhorn/longhorn
         chart_version: 1.3.2
-
+        release_values:
+          longhornManager:
+            tolerations:
+              - key: queue-worker
+                effect: NoSchedule
+                operator: Exists
+          longhornDriver:
+            tolerations:
+              - key: queue-worker
+                effect: NoSchedule
+                operator: Exists
