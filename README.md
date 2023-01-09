@@ -6,8 +6,13 @@ Requirements:
 - [Install k0sctl](https://github.com/k0sproject/k0sctl#installation)
 - Access to the STFC cloud via an openstack account, with [setup environment variables](https://stfc-cloud-docs.readthedocs.io/en/latest/howto/CreateVMFromCommandLine.html#setting-up-the-environment-to-select-project) on the terminal of choice.
 - Install conda (recommend mambaforge) for managing the k8s repo or install python-kubernetes, ansible, and all of the kubernetes management software (kubernetes-client, kuberentes-server, etc) into your system/distro.
-- [Install Cilium CLI](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/#install-the-cilium-cli)
-- [Install hubble Client](https://docs.cilium.io/en/v1.10/gettingstarted/hubble_setup/#install-the-hubble-client)
+
+Optional (Recommended for debugging and evaluating the cluster):
+----------------------------------------------------------------
+
+- [Install Cilium CLI (networking)](https://docs.cilium.io/en/stable/gettingstarted/k8s-install-default/#install-the-cilium-cli)
+- [Install hubble Client (networking webapp)](https://docs.cilium.io/en/v1.10/gettingstarted/hubble_setup/#install-the-hubble-client)
+- [K9s (K8s management in a terminal)](https://k9scli.io/topics/install/)
 
 Conda env setup
 ---------------
