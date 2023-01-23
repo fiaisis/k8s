@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: rundetection
-        image: ghcr.io/interactivereduction/rundetection@sha256:aa992a0f947ef453f5aa0bd8664b4cb85461dd3b213086938572c68da55defa6
+        image: ghcr.io/interactivereduction/rundetection@sha256:4f2bad37a5dcc7882b2bf11c192bc0b6759ae8b3694fe2fb55dcf98635a2a190
         env:
         - name: ACTIVEMQ_IP
           value: 172.16.100.197
