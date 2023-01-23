@@ -106,5 +106,5 @@ In order to update the container versions on the cluster, for each of the contai
 RunDetection:
 
 ```shell
-kubectl set image -n ir deployment/rundetection rundetection=ghcr.io/interactivereduction/rundetection:on-k8s --rolling-update
+kubectl set image -n ir deployment/rundetection rundetection=ghcr.io/interactivereduction/rundetection:sha256@commit-number --rolling-update
 ```

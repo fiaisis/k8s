@@ -10,7 +10,7 @@
         policy: reject
         log: true
         direction: incoming
-      retries: 10
+      retries: 100
       delay: 1
 
     - name: Allow SSH on all hosts
