@@ -6,3 +6,4 @@
     - role: load-balancer
     - role: firewall
     - role: isis-archive
+    - role: isis-ceph
