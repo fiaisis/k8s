@@ -1,0 +1,25 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobcontroller
+  namespace: ir
+spec:
+  selector:
+    matchLabels:
+      app: jobcontroller
+  template:
+    metadata:
+      labels:
+        app: jobcontroller
+    spec:
+      containers:
+      - name: jobcontroller
+        image: ghcr.io/interactivereduction/jobcontroller@sha256:036ac1393f269d9d3454ac6552cae77c04765e3c42dd73e46415ee3a0ed7d2f6
+        env:
+        - name: KAFKA_IP
+          value: kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local # Using the DNS service this will resolve to an actual IP address to the kafka service
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

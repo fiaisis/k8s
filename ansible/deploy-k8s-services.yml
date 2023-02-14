@@ -12,3 +12,4 @@
     - role: promtail
     - role: kafka
     - role: rundetection
+    - role: jobcontroller

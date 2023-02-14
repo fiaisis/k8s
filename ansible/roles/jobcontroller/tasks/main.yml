@@ -1,0 +1,21 @@
+---
+- name: Deployment of jobcontroller
+  delegate_to: localhost
+  run_once: true
+  block:
+    - name: Create ir namespace if it doesn't exist
+      kubernetes.core.k8s:
+        state: present
+        name: ir
+        api_version: v1
+        kind: Namespace
+
+    - name: Install jobcontroller
+      kubernetes.core.k8s:
+        state: present
+        src: jobcontroller.yml
+    
+    - name: Add kafka topic for completed-runs
+      kubernetes.core.k8s:
+        state: present
+        src: kafka-topic.yml

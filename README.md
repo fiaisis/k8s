@@ -108,3 +108,9 @@ RunDetection:
 ```shell
 kubectl set image -n ir deployment/rundetection rundetection=ghcr.io/interactivereduction/rundetection@sha256:commit-number
 ```
+
+JobController:
+
+```shell
+kubectl set image -n ir deployment/jobcontroller jobcontroller=ghcr.io/interactivereduction/jobcontroller@sha256:commit-number
+```
