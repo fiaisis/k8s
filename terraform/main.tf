@@ -4,7 +4,7 @@ variable "image" {
 
 # Used by the load balancer too
 variable "controller_flavour" {
-    default = "c3.medium"
+    default = "l3.micro"
 }
 
 variable "app_worker_flavour" {
@@ -16,7 +16,7 @@ variable "queue_worker_flavour" {
 }
 
 variable "controller_count" {
-    default = 3 # Need to update to load balancer definitions below when this changes to include the extra ips as they are not dynamic
+    default = 5 # Need to update to load balancer definitions below when this changes to include the extra ips as they are not dynamic
 }
 
 variable "app_worker_count" {
@@ -24,7 +24,7 @@ variable "app_worker_count" {
 }
 
 variable "queue_worker_count" {
-    default = 4
+    default = 10
 }
 
 variable "security_groups" {
@@ -41,6 +41,15 @@ resource "openstack_compute_keypair_v2" "keypair" {
 }
 
 ######################################################################################################
+# Server groups
+######################################################################################################
+
+resource "openstack_compute_servergroup_v2" "controllers-group" {
+    name = "controllers-group"
+    policies = ["soft-anti-affinity"]
+}
+
+######################################################################################################
 # Nodes
 ######################################################################################################
 
@@ -51,6 +60,9 @@ resource "openstack_compute_instance_v2" "k0s-controllers" {
   key_pair = "${openstack_compute_keypair_v2.keypair.name}"
   security_groups = var.security_groups
   count = var.controller_count
+  scheduler_hints {
+        group = openstack_compute_servergroup_v2.controllers-group.id 
+    }
 }
 
 resource "openstack_compute_instance_v2" "k0s-app-workers" {
@@ -147,7 +159,9 @@ output "haproxy_config" {
         {
             controller1 = openstack_compute_instance_v2.k0s-controllers[0].access_ip_v4,
             controller2 = openstack_compute_instance_v2.k0s-controllers[1].access_ip_v4,
-            controller3 = openstack_compute_instance_v2.k0s-controllers[2].access_ip_v4
+            controller3 = openstack_compute_instance_v2.k0s-controllers[2].access_ip_v4,
+            controller4 = openstack_compute_instance_v2.k0s-controllers[3].access_ip_v4,
+            controller5 = openstack_compute_instance_v2.k0s-controllers[4].access_ip_v4
         }
     )
 }
