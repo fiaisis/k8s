@@ -20,3 +20,10 @@
       kubernetes.core.k8s:
         state: present
         src: files/kafka-cluster.yml
+      when: dev == false
+    
+    - name: Create a dev kafka cluster
+      kubernetes.core.k8s:
+        state: present
+        src: files/dev-kafka-cluster.yml
+      when: dev == true

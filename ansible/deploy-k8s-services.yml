@@ -1,6 +1,8 @@
 ---
 - name: Deploy cluster components post k0s-deployment
   hosts: localhost
+  vars:
+    dev: false
   vars_files:
     - vars/vault.yml
   roles:

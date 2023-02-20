@@ -1,0 +1,11 @@
+---
+- name: Deploy cluster components in a developer environment missing - tainting, logging, metrics, networking (special)
+  hosts: localhost
+  vars:
+    dev: true
+  roles:
+    - role: traefik
+    - role: longhorn
+    - role: kafka
+    - role: rundetection
+    - role: jobcontroller
