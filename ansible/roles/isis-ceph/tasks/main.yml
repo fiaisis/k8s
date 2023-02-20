@@ -3,7 +3,8 @@
   become: true
   block:
     - name: Ensure dependencies are installed
-      ansible.builtin.package:
+      apt:
+        update_cache: true
         name: ceph
         state: present
 
@@ -28,3 +29,5 @@
         fstype: ceph
         opts: "name=isis_autoreduce,secretfile=/etc/ceph/deneb.key,noatime,_netdev"
         state: mounted
+      retries: 100
+      delay: 1

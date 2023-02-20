@@ -92,6 +92,7 @@
     # Needed for it to be persistent post restarts
     - name: Install `netfilter-persistent` && `iptables-persistent` packages
       apt:
+        update_cache: true
         name: "{{item}}"
         state: present
       with_items:

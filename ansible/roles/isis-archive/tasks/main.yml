@@ -4,6 +4,7 @@
   block:
     - name: Install cifs-utils and keyutils
       apt:
+        update_cache: true
         name: "{{item}}"
         state: present
       with_items:
@@ -57,4 +58,5 @@
         opts: "noserverino,vers=2.1,credentials=/archive.creds,_netdev"
         state: mounted
       retries: 100
+      delay: 1
       when: "'workers' in group_names"
