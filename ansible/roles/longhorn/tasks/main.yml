@@ -28,3 +28,6 @@
               - key: queue-worker
                 effect: NoSchedule
                 operator: Exists
+
+    - name: Wait until longhorn is up
+      shell: "kubectl wait -n longhorn-system --for=jsonpath='{.status.phase}'=Running pods --all --timeout=240s"

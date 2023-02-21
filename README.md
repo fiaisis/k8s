@@ -133,12 +133,6 @@ To deploy services to your cluster:
 ansible-playbook deploy-dev-k8s-services.yml
 ```
 
-If the Longhorn manager pod is failing run this command:
-
-```shell
-minikube ssh "sudo apt-get update;sudo apt-get install -y open-iscsi"
-```
-
 That's it! you have Interactive reduction running on a local Kubernetes cluster!
 
 Creating a kafka producer for connecting to the cluster and sending things to a topic
