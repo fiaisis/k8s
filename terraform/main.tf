@@ -16,11 +16,11 @@ variable "queue_worker_flavour" {
 }
 
 variable "controller_count" {
-    default = 5 # Need to update to load balancer definitions below when this changes to include the extra ips as they are not dynamic
+    default = 3 # Need to update to load balancer definitions below when this changes to include the extra ips as they are not dynamic
 }
 
 variable "app_worker_count" {
-    default = 5
+    default = 6
 }
 
 variable "queue_worker_count" {
@@ -114,7 +114,7 @@ locals {
                 }
             ]
             k0s = {
-                version = "1.24.7+k0s.0"
+                version = "1.25.6+k0s.0"
                 dynamicConfig = false
                 config = {
                     apiVersion = "k0s.k0sproject.io/v1beta1"
@@ -160,8 +160,6 @@ output "haproxy_config" {
             controller1 = openstack_compute_instance_v2.k0s-controllers[0].access_ip_v4,
             controller2 = openstack_compute_instance_v2.k0s-controllers[1].access_ip_v4,
             controller3 = openstack_compute_instance_v2.k0s-controllers[2].access_ip_v4,
-            controller4 = openstack_compute_instance_v2.k0s-controllers[3].access_ip_v4,
-            controller5 = openstack_compute_instance_v2.k0s-controllers[4].access_ip_v4
         }
     )
 }

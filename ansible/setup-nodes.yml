@@ -3,6 +3,7 @@
   vars_files:
   - vars/vault.yml
   roles:
+    - role: update-upgrade
     - role: load-balancer
     - role: firewall
     - role: isis-archive

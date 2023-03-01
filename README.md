@@ -47,7 +47,7 @@ terraform apply
 Setup an ssh-agent for connecting to the cluster with k0sctl. Example:
 
 ```shell
-eval "$(ssh-agent -s)"
+eval "$(ssh-agent -c)"
 ssh-add ~/.ssh/id_rsa
 ```
 
@@ -125,7 +125,7 @@ You will need the archive mounted locally follow these instructions (you may nee
 Start minkube by running this command (ensure kubernetes is the correct version):
 
 ```shell
-minikube start --kubernetes-version='1.24.7'
+minikube start --kubernetes-version='1.25.6'
 ```
 
 To deploy services to your cluster:
