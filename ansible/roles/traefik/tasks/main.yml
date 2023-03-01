@@ -10,7 +10,7 @@
 
     - name: Install traefik
       kubernetes.core.helm:
-        update_repo_cache: false
+        update_repo_cache: true
         name: traefik
         release_namespace: traefik
         create_namespace: true

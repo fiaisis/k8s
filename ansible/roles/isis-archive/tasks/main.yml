@@ -59,4 +59,6 @@
         state: mounted
       retries: 100
       delay: 1
+      register: result
+      until: result.failed == false
       when: "'workers' in group_names"

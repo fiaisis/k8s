@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Pasarus
+  description: Effectively just runs apt-get update -y && apt-get upgrade -y
+  license: GPLv3
+
+  min_ansible_version: "5.0"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+
+dependencies: []

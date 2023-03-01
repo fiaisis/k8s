@@ -10,7 +10,7 @@
 
     - name: Install cilium
       kubernetes.core.helm:
-        update_repo_cache: false
+        update_repo_cache: true
         name: cilium
         release_namespace: kube-system
         chart_ref: cilium/cilium

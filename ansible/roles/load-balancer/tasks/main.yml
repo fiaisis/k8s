@@ -4,6 +4,7 @@
   block:
     - name: Install `HAProxy`
       apt:
+        update_cache: true
         name: "haproxy"
         state: present
       when: "'loadbalancer' in group_names"

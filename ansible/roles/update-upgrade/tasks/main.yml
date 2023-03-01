@@ -1,0 +1,20 @@
+---
+- name: Update and upgrade
+  block:
+    - name: Update and Upgrade
+      become: true
+      apt:
+        update_cache: yes
+        name: "*"
+        state: latest
+      retries: 100
+      delay: 1
+      register: package_update_result
+      until: package_update_result.failed == false
+      
+    
+    - name: Reboot to finish upgrades machines with an allowance for slower machines
+      become: true
+      ansible.builtin.reboot:
+        reboot_timeout: 3600
+      when: package_update_result.changed

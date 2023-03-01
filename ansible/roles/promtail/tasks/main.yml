@@ -10,12 +10,12 @@
 
     - name: Ensure Promtail is deployed
       kubernetes.core.helm:
-        update_repo_cache: false
+        update_repo_cache: true
         name: promtail
         namespace: promtail
         create_namespace: true
         chart_ref: grafana/promtail
-        chart_version: 6.6.0
+        chart_version: 6.9.0
         release_values:
           config:
             clients:
@@ -23,6 +23,10 @@
                 basic_auth:
                   username: "{{ grafana_cloud_promtail.username }}"
                   password: "{{ grafana_cloud_promtail.token }}"
+            extraRelabelConfigs:
+              - source_labels: [__meta_kubernetes_pod_name]
+                regex: '.*konnectivity.*'
+                action: drop
           tolerations: [
             {
               "effect": "NoSchedule",
