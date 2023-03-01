@@ -15,7 +15,14 @@
         state: present
         src: jobcontroller.yml
     
+    - name: Create ir-jobs namespace if it doesn't exist
+      kubernetes.core.k8s:
+        state: present
+        name: ir-jobs
+        api_version: v1
+        kind: Namespace
+
     - name: Add kafka topic for completed-runs
       kubernetes.core.k8s:
         state: present
-        src: kafka-topic.yml
+        src: jobcontroller-kafka-topic.yml

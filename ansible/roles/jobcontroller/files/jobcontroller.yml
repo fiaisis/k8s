@@ -13,6 +13,7 @@ spec:
       labels:
         app: jobcontroller
     spec:
+      serviceAccountName: jobcontroller
       containers:
       - name: jobcontroller
         image: ghcr.io/interactivereduction/jobcontroller@sha256:b1602b218792029573783543b0d4ce764e4c07b3258db76cb25c9acdd685d8ab
@@ -23,3 +24,34 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "500m"
+
+# Role and permissions
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: jobcontroller
+  namespace: ir
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: jobcontroller
+rules:
+- apiGroups: ["batch"] # "" indicates the core API group
+  resources:
+    - jobs
+  verbs: ["get", "watch", "list", "create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: jobcontroller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: jobcontroller
+subjects:
+- kind: ServiceAccount
+  name: jobcontroller
+  namespace: ir
