@@ -16,7 +16,7 @@ spec:
       serviceAccountName: jobcontroller
       containers:
       - name: jobcontroller
-        image: ghcr.io/interactivereduction/jobcontroller@sha256:b1602b218792029573783543b0d4ce764e4c07b3258db76cb25c9acdd685d8ab
+        image: ghcr.io/interactivereduction/jobcontroller@sha256:f8595063294f1df8a9b22f20e19fbf2a3d10b955e27812ca5b983115cf724ccb
         env:
         - name: KAFKA_IP
           value: kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local # Using the DNS service this will resolve to an actual IP address to the kafka service
@@ -39,9 +39,14 @@ metadata:
   name: jobcontroller
 rules:
 - apiGroups: ["batch"] # "" indicates the core API group
-  resources:
-    - jobs
+  resources: ["jobs"]
   verbs: ["get", "watch", "list", "create"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
