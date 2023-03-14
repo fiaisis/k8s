@@ -10,14 +10,14 @@
       with_items:
         - cifs-utils
         - keyutils
-      when: "'workers' in group_names"
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
     
     - name: Create mountpoint
       ansible.builtin.file:
         path: /archive
         state: directory
         mode: "u=rwx,g=rx,o=rx"
-      when: "'workers' in group_names"
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
 
     - name: Ensure credentials fine is present
       ansible.builtin.lineinfile:
@@ -31,7 +31,7 @@
         - username={{ isis_archive.username }}
         - password={{ isis_archive.password }}
         - domain={{ isis_archive.domain }}
-      when: "'workers' in group_names"
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
     
     - name: Ensure DNS config is setup for the archive
       ansible.builtin.blockinfile:
@@ -42,13 +42,13 @@
         block: |
           [Resolve]
           Domains=isis.cclrc.ac.uk
-      when: "'workers' in group_names"
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
 
     - name: Restart resolved to ensure DNS configuration is up to date
       ansible.builtin.service:
         name: systemd-resolved.service
         state: restarted
-      when: "'workers' in group_names"
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
     
     - name: Ensure mount is configured
       ansible.builtin.mount:
@@ -61,4 +61,4 @@
       delay: 1
       register: result
       until: result.failed == false
-      when: "'workers' in group_names"
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"

@@ -122,10 +122,17 @@ It is recommended HEAVILY that you do not develop using the production cluster. 
 
 You will need the archive mounted locally follow these instructions (you may need to get on the work VPN or log in for this): <https://stfc365.sharepoint.com/sites/isiscomputingdivision-staffsite/Shared%20Documents/Mantid/MountISISArchiveLinux.txt>
 
+or run the following playbook to setup the archive and ceph locally on debian/ubuntu based linux operating systems, you need to replace the all caps words with the actual inputs:
+```shell
+ansible-playbook setup-local-machine.yml -K --extra-vars '{ "isis_archive": { "username": "FEDID", "password": "FEDID_PASSWORD", "domain": "ARCHIVE_DOMAIN"}, "isis_ceph" {"key": "CEPH_KEY"}}'
+```
+
 Start minkube by running this command (ensure kubernetes is the correct version):
 
 ```shell
-minikube start --kubernetes-version='1.25.6'
+minikube start --kubernetes-version='1.25.6' 
+minikube mount /archive:/archive &
+minikube mount /ceph:/ceph &
 ```
 
 To deploy services to your cluster:
@@ -150,7 +157,7 @@ set KAFKA_NODE_IP $(kubectl get node k0s-app-worker-5 -o=jsonpath='{range .statu
 Then you can actually connect to the kafka topic as a producer:
 
 ```shell
-~/kafka/bin/kafka-console-producer.sh --bootstrap-server $KAFKA_NODE_IP:$KAFKA_NODE_PORT --topic topic
+~/kafka/bin/kafka-console-producer.sh --bootstrap-server $KAFKA_NODE_IP:$KAFKA_NODE_PORT --topic detected-runs
 ```
 
 Once connected anything you type and then hit enter on will be sent to the kafka topic as a message!

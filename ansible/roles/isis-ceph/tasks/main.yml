@@ -7,12 +7,14 @@
         update_cache: true
         name: ceph
         state: present
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
 
     - name: Create directory
       ansible.builtin.file:
         path: /ceph
         state: directory
         mode: "u=rwx,g=rx,o=rx"
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
 
     - name: Ensure ceph secret key is present
       ansible.builtin.copy:
@@ -21,6 +23,7 @@
         owner: root
         group: root
         mode: "u=r,g=,o="
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
 
     - name: Mount CEPH
       ansible.builtin.mount:
@@ -33,3 +36,4 @@
       delay: 1
       register: result
       until: result.failed == false
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"

@@ -1,0 +1,12 @@
+- name: Setup the local machine
+  hosts: localhost
+  roles:
+    - role: isis-archive
+    - role: isis-ceph
+
+  tasks:
+    - name: Set permissions of /archive directory which is suitable for minikube to access it
+      become: true
+      file:
+        path: /archive
+        mode: '0777'
