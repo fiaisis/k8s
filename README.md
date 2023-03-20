@@ -69,7 +69,7 @@ Use ansible to activate the firewall and create the load balancer required for t
 cd ../ansible; ansible-playbook setup-nodes.yml --ask-vault-password; cd ../terraform
 ```
 
-Use terraform to output the data and then apply that to construct the k0s cluster.
+Use terraform to output the data and then apply that to construct the k0s cluster (if this fails you didn't add an ssh-agent).
 
 ```shell
 terraform output -raw k0s_cluster | k0sctl apply --no-wait --config -
@@ -97,6 +97,7 @@ Gotchas
 -------
 
 - `terraform apply` struggles with creating all the openstack VMs, this happens when doing it manually and is not related to terraform, it is due to cloud instability as far as we can tell.
+- The Kafka dependent containers, such as `JobController` and `RunDetection` may need to be manually restarted, if the Liveness and Health probes are not setup correctly.
 
 Updating different parts of the cluster
 ---------------------------------------
@@ -130,7 +131,7 @@ ansible-playbook setup-local-machine.yml -K --extra-vars '{ "isis_archive": { "u
 Start minkube by running this command (ensure kubernetes is the correct version):
 
 ```shell
-minikube start --kubernetes-version='1.25.6' 
+minikube start --kubernetes-version='1.25.6'
 minikube mount /archive:/archive &
 minikube mount /ceph:/ceph &
 ```

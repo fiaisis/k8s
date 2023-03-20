@@ -2,6 +2,22 @@
 - name: Mount ceph
   become: true
   block:
+    - name: Create autoreduce group
+      group:
+        name: autoreduce
+        gid: "{{ isis_ceph.uid }}"
+        state: present
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
+
+    - name: Create autoreduce user
+      user:
+        name: autoreduce
+        shell: /bin/bash
+        state: present
+        uid: "{{ isis_ceph.uid }}"
+        group: autoreduce
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
+
     - name: Ensure dependencies are installed
       apt:
         update_cache: true
