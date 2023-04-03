@@ -16,16 +16,25 @@ spec:
       serviceAccountName: jobcontroller
       containers:
       - name: jobcontroller
-        image: ghcr.io/interactivereduction/jobcontroller@sha256:552b323d2c5be8e54ea32530d663cbe9cd90c38471c6864cc67ffa89c7253ed9
+        image: ghcr.io/interactivereduction/jobcontroller@sha256:ffe12205f8598d7bb76f562f9d912b1e55e43d48e90839c0f2d7ce2e6ba340d5
         env:
         - name: KAFKA_IP
           value: kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local # Using the DNS service this will resolve to an actual IP address to the kafka service
         - name: REDUCE_USER_ID
           value: "{{ reduce_user_id }}"
+        - name: PYTHONPATH
+          value: /jobcontroller
+        - name: DB_IP
+          value: "{{ db.ip}}"
+        - name: DB_PASSWORD
+          value: "{{ db.password }}"
+        - name: DB_USERNAME
+          value: "{{ db.username }}"
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
+        command: ["jobcontroller"]
 
 # Role and permissions
 ---
