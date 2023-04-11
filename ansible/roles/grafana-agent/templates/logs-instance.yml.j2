@@ -1,0 +1,25 @@
+---
+apiVersion: monitoring.grafana.com/v1alpha1
+kind: LogsInstance
+metadata:
+  name: primary
+  namespace: grafana
+  labels:
+    agent: grafana-agent-logs
+spec:
+  clients:
+  - url: https://logs-prod-eu-west-0.grafana.net/loki/api/v1/push
+    basicAuth:
+      username:
+        name: primary-credentials-logs
+        key: "{{ grafana_cloud_promtail.username }}"
+      password:
+        name: primary-credentials-logs
+        key: "{{ grafana_cloud_promtail.token }}"
+
+  # Supply an empty namespace selector to look in all namespaces. Remove
+  # this to only look in the same namespace as the LogsInstance CR
+  podLogsNamespaceSelector: {}
+  podLogsSelector:
+    matchLabels:
+      instance: primary

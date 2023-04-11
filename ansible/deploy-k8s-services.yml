@@ -10,8 +10,10 @@
     - role: cilium
     - role: traefik
     - role: longhorn
-    - role: prometheus
-    - role: promtail
+    # - role: prometheus
+    # - role: promtail
+    - role: grafana-agent-crds
+    - role: grafana-agent
     - role: kafka
     - role: rundetection
     - role: jobcontroller

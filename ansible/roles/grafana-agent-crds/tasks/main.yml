@@ -1,0 +1,26 @@
+---
+- name: Deployment of grafana agent operator
+  delegate_to: localhost
+  run_once: true
+  vars:
+    crd_urls:
+      - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.coreos.com_podmonitors.yaml
+      - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.coreos.com_probes.yaml
+      - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.coreos.com_servicemonitors.yaml
+      - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.grafana.com_grafanaagents.yaml
+      - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.grafana.com_integrations.yaml
+      - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.grafana.com_logsinstances.yaml
+      - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.grafana.com_metricsinstances.yaml
+      - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.grafana.com_podlogs.yaml
+  block:
+  - name: Download CRD manifest
+    get_url:
+      url: "{{ item }}"
+      dest: "/tmp/{{ item | basename }}"
+    loop: "{{ crd_urls }}"
+
+  - name: Deploy Agent Operator CRDs
+    k8s:
+      src: "/tmp/{{ item | basename }}"
+      state: present
+    loop: "{{ crd_urls }}"
