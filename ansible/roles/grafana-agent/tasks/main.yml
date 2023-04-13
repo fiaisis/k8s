@@ -23,12 +23,12 @@
     - name: Install grafana agent metric instance
       kubernetes.core.k8s:
         state: present
-        src: "{{ lookup('template', 'metrics-instance.yml.j2') }}"
+        definition: "{{ lookup('template', 'metrics-instance.yml.j2') }}"
 
     - name: Create a credentials secret in Kubernetes for metrics
       kubernetes.core.k8s:
         state: present
-        src: "{{ lookup('template', 'metrics-credentials.yml.j2') }}"
+        definition: "{{ lookup('template', 'metrics-credentials.yml.j2') }}"
     
     - name: Create a kubelet service monitor
       kubernetes.core.k8s:
@@ -43,12 +43,12 @@
     - name: Create a LogsInstance
       kubernetes.core.k8s:
         state: present
-        src: "{{ lookup('template', 'logs-instance.yml.j2') }}"
+        definition: "{{ lookup('template', 'logs-instance.yml.j2') }}"
 
     - name: Create a credentials secret in Kubernetes for Logs
       kubernetes.core.k8s:
         state: present
-        src: "{{ lookup('template', 'logs-credentials.yml.j2') }}"
+        definition: "{{ lookup('template', 'logs-credentials.yml.j2') }}"
     
     - name: Create a PodLogs
       kubernetes.core.k8s:
