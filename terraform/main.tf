@@ -12,19 +12,19 @@ variable "app_worker_flavour" {
 }
 
 variable "queue_worker_flavour" {
-    default = "l2.small"
+    default = "l2.medium"
 }
 
 variable "controller_count" {
-    default = 3 # Need to update to load balancer definitions below when this changes to include the extra ips as they are not dynamic
+    default = 3 # Need to update the load balancer definitions below when this changes to include the extra ips as they are not dynamic
 }
 
 variable "app_worker_count" {
-    default = 6
+    default = 4
 }
 
 variable "queue_worker_count" {
-    default = 10
+    default = 3
 }
 
 variable "security_groups" {

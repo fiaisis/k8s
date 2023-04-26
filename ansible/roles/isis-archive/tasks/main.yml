@@ -19,7 +19,7 @@
         mode: "u=rwx,g=rx,o=rx"
       when: "'workers' in group_names or inventory_hostname == 'localhost'"
 
-    - name: Ensure credentials fine is present
+    - name: Ensure credentials file is present
       ansible.builtin.lineinfile:
         path: /archive.creds
         search_string: "{{item}}"

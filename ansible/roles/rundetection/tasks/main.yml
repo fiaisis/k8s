@@ -13,7 +13,7 @@
     - name: Install rundetection
       kubernetes.core.k8s:
         state: present
-        src: rundetection.yml
+        definition: "{{ lookup('template', 'rundetection.yml.j2') }}"
     
     - name: Add kafka topic for rundetection
       kubernetes.core.k8s:

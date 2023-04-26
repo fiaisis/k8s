@@ -1,5 +1,8 @@
+---
 - name: Setup the local machine
   hosts: localhost
+  vars_files:
+  - vars/vault.yml
   roles:
     - role: isis-archive
     - role: isis-ceph

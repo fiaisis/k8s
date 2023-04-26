@@ -5,6 +5,8 @@ metadata:
   name: jobcontroller
   namespace: ir
 spec:
+  security_context:
+    runAsUser: "{{ reduce_user_id }}"
   selector:
     matchLabels:
       app: jobcontroller
@@ -16,7 +18,7 @@ spec:
       serviceAccountName: jobcontroller
       containers:
       - name: jobcontroller
-        image: ghcr.io/interactivereduction/jobcontroller@sha256:5395bd7f51b0449c9eeffe0b55acc7b143928d55dc8516a14ea7353baa77ce26
+        image: ghcr.io/interactivereduction/jobcontroller@sha256:341ca8591f8ab767e65b112f936b55f71e788f5a9c63655af06b1748971cf66f
         env:
         - name: KAFKA_IP
           value: kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local # Using the DNS service this will resolve to an actual IP address to the kafka service
@@ -33,6 +35,14 @@ spec:
         - name: IR_API
           value: ir-api-service.ir.svc.cluster.local:80
         command: ["jobcontroller"]
+        volumeMounts:
+          - name: ceph-mount
+            mountPath: /ceph
+      volumes:
+        - name: ceph-mount
+          hostPath:
+            type: Directory
+            path: /ceph
 
 # Role and permissions
 ---
@@ -55,7 +65,7 @@ rules:
   verbs: ["get"]
 - apiGroups: [""]
   resources: ["pods"]
-  verbs: ["list"]
+  verbs: ["list", "get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

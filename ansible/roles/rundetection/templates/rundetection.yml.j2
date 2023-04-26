@@ -5,6 +5,7 @@ metadata:
   name: rundetection
   namespace: ir
 spec:
+  replicas: 3
   selector:
     matchLabels:
       app: rundetection
@@ -15,16 +16,18 @@ spec:
     spec:
       containers:
       - name: rundetection
-        image: ghcr.io/interactivereduction/rundetection@sha256:76e2f5ccfbd129a950d5a71f72f5dfec2226ddaec1eec32baf911f5f8553a79c
+        image: ghcr.io/interactivereduction/rundetection@sha256:895fb8e09a344c35ff03a5d96f6ff86918c79a0242397f9cf3a002f9ee3aa576
         env:
         - name: ACTIVEMQ_IP
-          value: 172.16.100.197
+          value: "{{ active_mq_prod.ip }}"
+        - name: ACTIVEMQ_USER
+          value: "{{ active_mq_prod.username }}"
+        - name: ACTIVEMQ_PASS
+          value: "{{ active_mq_prod.password }}"
+        - name: ACTIVEMQ_QUEUE
+          value: detected-runs
         - name: KAFKA_IP
           value: kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local # Using the DNS service this will resolve to an actual IP address to the kafka service
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
         volumeMounts:
           - name: archive-mount
             mountPath: /archive
