@@ -31,8 +31,14 @@ spec:
         volumeMounts:
           - name: archive-mount
             mountPath: /archive
+          - name: ceph-mount
+            mountPath: /ceph
       volumes:
         - name: archive-mount
           hostPath:
             type: Directory
             path: /archive
+        - name: ceph-mount
+          hostPath:
+            type: Directory
+            path: /ceph
