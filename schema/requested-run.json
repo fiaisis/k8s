@@ -1,0 +1,40 @@
+{
+    "description": "The way a system will request a run for the job controller",
+    "type": "object",
+    "properties": {
+        "run_number": {
+            "type": "number"
+        },
+        "instrument": {
+            "type": "string"
+        },
+        "experiment_title": {
+            "type": "string"
+        },
+        "experiment_number": {
+            "type": "string"
+        },
+        "filepath": {
+            "type": "string"
+        },
+        "run_start": {
+            "type": "string"
+        },
+        "run_end": {
+            "type": "string"
+        },
+        "raw_frames": {
+            "type": "number"
+        },
+        "good_frames": {
+            "type": "number"
+        },
+        "users": {
+            "type": "string"
+        },
+        "additional_values": {}
+    },
+    "required": [
+        "run_number", "instrument", "experiment_title", "experiment_number", "filepath", "run_start", "run_end", "raw_frames", "good_frames", "users", "additional_values"
+    ]
+}

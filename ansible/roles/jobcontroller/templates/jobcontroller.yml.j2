@@ -18,7 +18,7 @@ spec:
       serviceAccountName: jobcontroller
       containers:
       - name: jobcontroller
-        image: ghcr.io/interactivereduction/jobcontroller@sha256:8a5c994d87c6c20219c426d6b32b8e522ad70a73bfe36aa690fe6dab2474ed4e
+        image: ghcr.io/interactivereduction/jobcontroller@sha256:421727476b14fb7abc103c89abc1e609576f3719311d9a4d9d5f62a4442391a1
         env:
         - name: KAFKA_IP
           value: kafka-cluster-kafka-bootstrap.kafka.svc.cluster.local # Using the DNS service this will resolve to an actual IP address to the kafka service

@@ -1,0 +1,6 @@
+---
+- name: Deploy cluster network
+  hosts: localhost
+  roles:
+    - role: cilium
+    - role: traefik

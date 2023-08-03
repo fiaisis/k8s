@@ -15,6 +15,10 @@ variable "queue_worker_flavour" {
     default = "l2.medium"
 }
 
+variable "ci_cd_worker_flavour" {
+    default = "l2.small"
+}
+
 variable "controller_count" {
     default = 3 # Need to update the load balancer definitions below when this changes to include the extra ips as they are not dynamic
 }
@@ -24,7 +28,27 @@ variable "app_worker_count" {
 }
 
 variable "queue_worker_count" {
+    default = 2
+}
+
+variable "controller_staging_count" {
+    default = 1
+}
+
+variable "app_worker_staging_count" {
     default = 3
+}
+
+variable "queue_worker_staging_count" {
+    default = 1
+}
+
+variable "controller_ci_cd_count" {
+    default = 1
+}
+
+variable "worker_ci_cd_count" {
+    default = 2
 }
 
 variable "security_groups" {
@@ -50,7 +74,7 @@ resource "openstack_compute_servergroup_v2" "controllers-group" {
 }
 
 ######################################################################################################
-# Nodes
+# Nodes - Prod
 ######################################################################################################
 
 resource "openstack_compute_instance_v2" "k0s-controllers" {
@@ -89,6 +113,59 @@ resource "openstack_compute_instance_v2" "k0s-load-balancer" {
     flavor_name = var.controller_flavour
     key_pair = "${openstack_compute_keypair_v2.keypair.name}"
     security_groups = var.security_groups
+}
+
+######################################################################################################
+# Nodes - Staging
+######################################################################################################
+
+resource "openstack_compute_instance_v2" "k0s-controllers-staging" {
+  name = "k0s-staging-controller-${count.index+1}"
+  image_name = var.image
+  flavor_name = var.controller_flavour
+  key_pair = "${openstack_compute_keypair_v2.keypair.name}"
+  security_groups = var.security_groups
+  count = var.controller_staging_count
+}
+
+resource "openstack_compute_instance_v2" "k0s-app-workers-staging" {
+  name = "k0s-staging-app-worker-${count.index+1}"
+  image_name = var.image
+  flavor_name = var.app_worker_flavour
+  key_pair = "${openstack_compute_keypair_v2.keypair.name}"
+  security_groups = var.security_groups
+  count = var.app_worker_staging_count
+}
+
+resource "openstack_compute_instance_v2" "k0s-queue-workers-staging" {
+  name = "k0s-staging-queue-worker-${count.index+1}"
+  image_name = var.image
+  flavor_name = var.queue_worker_flavour
+  key_pair = "${openstack_compute_keypair_v2.keypair.name}"
+  security_groups = var.security_groups
+  count = var.queue_worker_staging_count
+}
+
+######################################################################################################
+# Nodes - CD/CI Cluster
+######################################################################################################
+
+resource "openstack_compute_instance_v2" "k0s-controllers-ci-cd" {
+  name = "k0s-ci-cd-controller-${count.index+1}"
+  image_name = var.image
+  flavor_name = var.controller_flavour
+  key_pair = "${openstack_compute_keypair_v2.keypair.name}"
+  security_groups = var.security_groups
+  count = var.controller_ci_cd_count
+}
+
+resource "openstack_compute_instance_v2" "k0s-worker-ci-cd" {
+  name = "k0s-ci-cd-worker-${count.index+1}"
+  image_name = var.image
+  flavor_name = var.ci_cd_worker_flavour
+  key_pair = "${openstack_compute_keypair_v2.keypair.name}"
+  security_groups = var.security_groups
+  count = var.worker_ci_cd_count
 }
 
 ######################################################################################################
@@ -135,10 +212,85 @@ locals {
             }
         }
     }
+
+    k0s_tmpl_staging = {
+        apiVersion = "k0sctl.k0sproject.io/v1beta1"
+        kind = "cluster"
+        metadata = {
+            name = "k0s-cluster-staging"
+        }
+        spec = {
+            hosts = [
+                for host in concat(openstack_compute_instance_v2.k0s-controllers-staging, openstack_compute_instance_v2.k0s-app-workers-staging, openstack_compute_instance_v2.k0s-queue-workers-staging) : {
+                    ssh = {
+                        address = host.access_ip_v4
+                        user = openstack_compute_keypair_v2.keypair.name
+                        port = 22
+                    }
+                    role = "${length(regexall("controller", host.name)) > 0 ? "controller" : "worker" }"
+                }
+            ]
+            k0s = {
+                version = "1.25.6+k0s.0"
+                dynamicConfig = false
+                config = {
+                    apiVersion = "k0s.k0sproject.io/v1beta1"
+                    kind = "cluster"
+                    metadata = {
+                        name = "k0s"
+                    }
+                    spec = {
+                        network = {
+                            provider = "custom"
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    k0s_tmpl_ci_cd = {
+        apiVersion = "k0sctl.k0sproject.io/v1beta1"
+        kind = "cluster"
+        metadata = {
+            name = "k0s-cluster-ci-cd"
+        }
+        spec = {
+            hosts = [
+                for host in concat(openstack_compute_instance_v2.k0s-controllers-ci-cd, openstack_compute_instance_v2.k0s-worker-ci-cd) : {
+                    ssh = {
+                        address = host.access_ip_v4
+                        user = openstack_compute_keypair_v2.keypair.name
+                        port = 22
+                    }
+                    role = "${length(regexall("controller", host.name)) > 0 ? "controller" : "worker" }"
+                }
+            ]
+            k0s = {
+                version = "1.25.6+k0s.0"
+                dynamicConfig = false
+                config = {
+                    apiVersion = "k0s.k0sproject.io/v1beta1"
+                    kind = "cluster"
+                    metadata = {
+                        name = "k0s"
+                    }
+                }
+            }
+        }
+    }
 }
 
 output "k0s_cluster" {
   value = yamlencode(local.k0s_tmpl)
+}
+
+output "k0s_cluster_staging" {
+  value = yamlencode(local.k0s_tmpl_staging)
+}
+
+output "k0s_cluster_ci_cd" {
+  value = yamlencode(local.k0s_tmpl_ci_cd)
 }
 
 output "ansible_inventory" {
@@ -152,6 +304,30 @@ output "ansible_inventory" {
     }
   )
 }
+
+
+output "ansible_inventory_staging" {
+  value = templatefile(
+    "${path.module}/templates/ansible-inventory-staging.tftpl",
+    {
+        user = openstack_compute_keypair_v2.keypair.name,
+        controllers = openstack_compute_instance_v2.k0s-controllers-staging.*.access_ip_v4,
+        workers = concat(openstack_compute_instance_v2.k0s-app-workers-staging.*.access_ip_v4, openstack_compute_instance_v2.k0s-queue-workers-staging.*.access_ip_v4)
+    }
+  )
+}
+
+output "ansible_inventory_ci_cd" {
+  value = templatefile(
+    "${path.module}/templates/ansible-inventory-staging.tftpl",
+    {
+        user = openstack_compute_keypair_v2.keypair.name,
+        controllers = openstack_compute_instance_v2.k0s-controllers-ci-cd.*.access_ip_v4,
+        workers = openstack_compute_instance_v2.k0s-worker-ci-cd.*.access_ip_v4
+    }
+  )
+}
+
 
 output "haproxy_config" {
     value = templatefile(

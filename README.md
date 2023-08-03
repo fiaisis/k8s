@@ -32,8 +32,8 @@ After installing the conda env, activate it and install this plugin to helm.
 helm plugin install https://github.com/databus23/helm-diff
 ```
 
-Cloud setup and deploy k0s via k0sctl in terraform
----------------------------------------------------
+Cloud setup and deploy k0s via k0sctl in terraform (both prod and staging)
+--------------------------------------------------------------------------
 
 You can achieve this by using terraform (included in the conda environment) from inside the terraform directory. `terraform apply` can fail due to cloud instability, if it does, just run it again. You need to have setup the environment variables for openstack listed in the requirements at the top of this file.
 
@@ -55,6 +55,8 @@ Use terraform to output the ansible inventory into your ansible directory
 
 ```shell
 terraform output -raw ansible_inventory > ../ansible/inventory.ini
+terraform output -raw ansible_inventory_staging > ../ansible/inventory-staging.ini
+terraform output -raw ansible_inventory_ci_cd > ../ansible/inventory-ci-cd.ini
 ```
 
 Use terraform to output the haproxy.cfg
@@ -66,19 +68,25 @@ terraform output -raw haproxy_config > ../ansible/haproxy.cfg
 Use ansible to activate the firewall and create the load balancer required for the k0s cluster (It is recommended to run these repeatedly until they execute with no errors):
 
 ```shell
-cd ../ansible; ansible-playbook setup-nodes.yml --ask-vault-password; cd ../terraform
+cd ../ansible; ansible-playbook setup-nodes.yml -i inventory.ini --ask-vault-password; cd ../terraform
+cd ../ansible; ansible-playbook setup-nodes.yml -i inventory-staging.ini --ask-vault-password; cd ../terraform
+cd ../ansible; ansible-playbook setup-ci-cd-nodes.yml -i inventory-ci-cd.ini; cd ../terraform
 ```
 
 Use terraform to output the data and then apply that to construct the k0s cluster (if this fails you didn't add an ssh-agent).
 
 ```shell
 terraform output -raw k0s_cluster | k0sctl apply --no-wait --config -
+terraform output -raw k0s_cluster_staging | k0sctl apply --no-wait --config -
+terraform output -raw k0s_cluster_ci_cd | k0sctl apply --no-wait --config -
 ```
 
 Export the kubeconfig to the top of the repository, whilst in the terraform directory
 
 ```shell
 terraform output -raw k0s_cluster | k0sctl kubeconfig --config - > ../kubeconfig
+terraform output -raw k0s_cluster_staging | k0sctl kubeconfig --config - > ../kubeconfig-staging
+terraform output -raw k0s_cluster_ci_cd | k0sctl kubeconfig --config - > ../kubeconfig-ci-cd
 ```
 
 Export KUBECONFIG as an environment variable so that ansible can pick it up
@@ -87,11 +95,39 @@ Export KUBECONFIG as an environment variable so that ansible can pick it up
 export KUBECONFIG=/path/to/repository/kubeconfig
 ```
 
-Run the playbook for deploying K8s tools such as Traefik, Cilium, Longhorn, Prometheus, Promtail etc.
+Run the playbook for deploying K8s tools such as Traefik, Cilium, Longhorn, Prometheus, Promtail etc. (This will just deploy to prod, you need to change KUBECONFIG env var to the staging kubeconfig (kubeconfig-staging) file to do staging)
 
 ```shell
 cd ../ansible; ansible-playbook deploy-k8s-services.yml --ask-vault-password ; cd ../terraform
+cd ../ansible; ansible-playbook deploy-k8s-networking.yml -i inventory-staging.ini --ask-vault-password; cd ../terraform
 ```
+
+Setup ArgoCD
+------------
+
+This section assumes that you have the context setup appropriately in the Kubeconfigs
+
+Install ArgoCD:
+```shell
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+```
+
+Setup ArgoCD CLI: https://argo-cd.readthedocs.io/en/stable/getting_started/#2-download-argo-cd-cli
+
+Create the Service type load balancer:
+```shell
+kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
+```
+
+Get the initial password:
+```
+argocd admin initial-password -n argocd
+```
+
+Login to the UI using the IP of the worker node running the ArgoCD server, and the port defined in the service for ArgoCD as a URL in your web browser. The username is admin, and the password you already have.
+
+Change the password using the user settings to the one in Keeper so everyone who needs the password has it availiable.
 
 Gotchas
 -------
