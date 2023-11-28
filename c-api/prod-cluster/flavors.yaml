@@ -1,0 +1,24 @@
+# This file controls the workers found within a cluster
+
+# The worker node groups for the cluster
+nodeGroups:
+  - name: worker
+    machineFlavor: l2.medium
+    machineCount: 5
+
+nodeGroupDefaults:
+  autoscale: false
+  machineFlavor: l2.tiny
+
+  healthCheck:
+    enabled: true
+    spec:
+      maxUnhealthy: 100%
+      nodeStartupTimeout: 10m0s
+      unhealthyConditions:
+        - type: Ready
+          status: Unknown
+          timeout: 5m0s
+        - type: Ready
+          status: "False"
+          timeout: 5m0s

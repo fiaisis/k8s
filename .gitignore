@@ -2,3 +2,4 @@ kubeconfig*
 .terraform*
 inventory*.ini
 haproxy.cfg
+*clouds*.yaml

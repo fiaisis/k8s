@@ -69,7 +69,7 @@ Use ansible to activate the firewall and create the load balancer required for t
 
 ```shell
 cd ../ansible; ansible-playbook setup-nodes.yml -i inventory.ini --ask-vault-password; cd ../terraform
-cd ../ansible; ansible-playbook setup-nodes.yml -i inventory-staging.ini --ask-vault-password; cd ../terraform
+cd ../ansible; ansible-playbook setup-nodes-staging.yml -i inventory-staging.ini --ask-vault-password; cd ../terraform
 cd ../ansible; ansible-playbook setup-ci-cd-nodes.yml -i inventory-ci-cd.ini; cd ../terraform
 ```
 
@@ -98,7 +98,7 @@ export KUBECONFIG=/path/to/repository/kubeconfig
 Run the playbook for deploying K8s tools such as Traefik, Cilium, Longhorn, Prometheus, Promtail etc. (This will just deploy to prod, you need to change KUBECONFIG env var to the staging kubeconfig (kubeconfig-staging) file to do staging)
 
 ```shell
-cd ../ansible; ansible-playbook deploy-k8s-services.yml --ask-vault-password ; cd ../terraform
+cd ../ansible; ansible-playbook deploy-k8s-networking.yml --ask-vault-password ; cd ../terraform
 cd ../ansible; ansible-playbook deploy-k8s-networking.yml -i inventory-staging.ini --ask-vault-password; cd ../terraform
 ```
 
@@ -128,6 +128,8 @@ argocd admin initial-password -n argocd
 Login to the UI using the IP of the worker node running the ArgoCD server, and the port defined in the service for ArgoCD as a URL in your web browser. The username is admin, and the password you already have.
 
 Change the password using the user settings to the one in Keeper so everyone who needs the password has it availiable.
+
+Go follow the GitOps repo [README](https://github.com/interactivereduction/gitops) now.
 
 Gotchas
 -------
