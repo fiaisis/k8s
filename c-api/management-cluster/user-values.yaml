@@ -3,7 +3,7 @@
 # to be used by the cluster. If this is not set, a new floating IP will be
 # allocated for the cluster each time it is created and clusters cannot .
 apiServer:
-  floatingIP: "130.246.81.245"
+  floatingIP: "130.246.212.192"
 
 # --------------------------- Optional Values -------------------------
 # List of comma separated additional packages to install on cluster nodes
@@ -33,4 +33,4 @@ registryAuth:
 
 # The name of the SSH key to inject into cluster machines, this can be
 # left blank if a user does not require SSH access to the machines
-machineSSHKeyName: vxw59196
+machineSSHKeyName: sam-laptop

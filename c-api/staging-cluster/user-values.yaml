@@ -3,7 +3,7 @@
 # to be used by the cluster. If this is not set, a new floating IP will be
 # allocated for the cluster each time it is created and clusters cannot .
 apiServer:
-  floatingIP: "130.246.81.175"
+  floatingIP: "130.246.214.191"
 
 # --------------------------- Optional Values -------------------------
 # List of comma separated additional packages to install on cluster nodes
@@ -13,7 +13,7 @@ controlPlane:
   # The number of control plane machines to deploy
   # For high-availability, this should be greater than 1
   # For etcd quorum, it should be odd - usually 3, or 5 for very large clusters
-  machineCount: 1
+  machineCount: 3
   # The flavor to use for control plane machines
   machineFlavor: l3.nano
 
@@ -33,4 +33,4 @@ registryAuth:
 
 # The name of the SSH key to inject into cluster machines, this can be
 # left blank if a user does not require SSH access to the machines
-machineSSHKeyName: vxw59196
+machineSSHKeyName: sam-laptop

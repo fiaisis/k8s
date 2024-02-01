@@ -30,7 +30,7 @@ Configure local cluster to create management cluster
 clusterctl init --infrastructure openstack
 
 cd management-cluster
-export CLUSTER_NAME="k8s-management"
+export CLUSTER_NAME="management"
 
 kubectl create namespace clusters
 
@@ -38,7 +38,7 @@ helm repo add capi https://stackhpc.github.io/capi-helm-charts
 helm repo add capi-addons https://stackhpc.github.io/cluster-api-addon-provider
 helm repo update
 
-helm upgrade cluster-api-addon-provider capi-addons/cluster-api-addon-provider --install --version ">=0.1.0-dev.0.main.0,<0.1.0-dev.0.main.9999999999" --wait -n clusters
+helm upgrade cluster-api-addon-provider capi-addons/cluster-api-addon-provider --install --wait -n clusters --version 0.3.1
 
 helm upgrade $CLUSTER_NAME capi/openstack-cluster --install -f values.yaml -f clouds.yaml -f user-values.yaml -f flavors.yaml -n clusters
 cd ..
@@ -64,7 +64,7 @@ This management cluster will also need the cluster-api-addon-provider so install
 
 ```bash
 kubectl create namespace clusters --kubeconfig "kubeconfig-$CLUSTER_NAME"
-helm upgrade cluster-api-addon-provider capi-addons/cluster-api-addon-provider --install --version ">=0.1.0-dev.0.main.0,<0.1.0-dev.0.main.9999999999" --wait -n clusters --kubeconfig "kubeconfig-$CLUSTER_NAME"
+helm upgrade cluster-api-addon-provider capi-addons/cluster-api-addon-provider --install --wait -n clusters --version 0.3.1
 ```
 
 Wait for the migration to complete by waiting for the following to report as complete:
@@ -86,7 +86,7 @@ Now that we have the management cluster setup what we need to do is create our f
 To do this run the following commands:
 ```bash
 cd staging-cluster
-export CLUSTER_NAME="k8s-staging"
+export CLUSTER_NAME="staging"
 helm upgrade $CLUSTER_NAME capi/openstack-cluster --install -f values.yaml -f clouds.yaml -f user-values.yaml -f flavors.yaml -n clusters --wait
 cd ..
 clusterctl get kubeconfig $CLUSTER_NAME -n clusters > "kubeconfig-$CLUSTER_NAME"
@@ -97,7 +97,7 @@ clusterctl get kubeconfig $CLUSTER_NAME -n clusters > "kubeconfig-$CLUSTER_NAME"
 Now do the same but for production:
 ```bash
 cd prod-cluster
-export CLUSTER_NAME="k8s-prod"
+export CLUSTER_NAME="production"
 helm upgrade $CLUSTER_NAME capi/openstack-cluster --install -f values.yaml -f clouds.yaml -f user-values.yaml -f flavors.yaml -n clusters --wait
 cd ..
 clusterctl get kubeconfig $CLUSTER_NAME -n clusters > "kubeconfig-$CLUSTER_NAME"
@@ -115,7 +115,7 @@ kubectl krew install konfig
 
 Use it like this:
 ```shell
-konfig merge kubeconfig-k8s-management kubeconfig-k8s-prod kubeconfig-k8s-staging > kubeconfig-all 
+kubectl konfig merge kubeconfig-management kubeconfig-production kubeconfig-staging > kubeconfig-all 
 ```
 
 Set your new kubeconfig as the active one
@@ -128,7 +128,7 @@ export KUBECONFIG="<path/to/kubeconfig-all>"
 This section assumes that you have the context setup appropriately in the Kubeconfigs, set your context equal to k8s-management.
 
 ```shell
-kubectl config use-context k8s-management
+kubectl config use-context management
 ```
 
 Install ArgoCD:
@@ -172,14 +172,18 @@ argocd --port-forward --port-forward-namespace=argocd login --username=admin --p
 Add cluster using CLI for staging:
 
 ```bash
-argocd --port-forward --port-forward-namespace=argocd cluster add k8s-staging-admin@k8s-staging --yes
+argocd --port-forward --port-forward-namespace=argocd cluster add staging --yes
 ```
+
+Once you've done this, change the name of the cluster in the UI to just `staging` instead of the long context name.
 
 Add cluster using CLI for prod
 
 ```bash
-argocd --port-forward --port-forward-namespace=argocd cluster add k8s-prod-admin@k8s-prod --yes
+argocd --port-forward --port-forward-namespace=argocd cluster add prod --yes
 ```
+
+Once you've done this, change the name of the cluster in the UI to just `prod` instead of the long context name.
 
 Then follow the rest of the instructions in the gitops repo for adding the app of apps. These can be found [here](https://github.com/interactivereduction/gitops/blob/main/README.md#how-to-deploy-the-app-of-apps).
 

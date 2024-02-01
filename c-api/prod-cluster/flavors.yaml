@@ -3,7 +3,7 @@
 # The worker node groups for the cluster
 nodeGroups:
   - name: worker
-    machineFlavor: l2.medium
+    machineFlavor: l6.c124
     machineCount: 5
 
 nodeGroupDefaults:

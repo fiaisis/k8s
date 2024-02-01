@@ -3,3 +3,5 @@ kubeconfig*
 inventory*.ini
 haproxy.cfg
 *clouds*.yaml
+
+.idea

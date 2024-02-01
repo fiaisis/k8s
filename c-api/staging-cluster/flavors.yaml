@@ -3,8 +3,8 @@
 # The worker node groups for the cluster
 nodeGroups:
   - name: worker
-    machineFlavor: l2.xsmall
-    machineCount: 3
+    machineFlavor: l2.tiny
+    machineCount: 5
 
 nodeGroupDefaults:
   autoscale: false
