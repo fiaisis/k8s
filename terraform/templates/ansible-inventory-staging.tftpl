@@ -1,9 +1,0 @@
-[controllers]
-%{ for hostname, ip in controllers ~}
-${ip} ansible_host=${ip} ansible_user=${user}
-%{ endfor ~}
-
-[workers]
-%{ for hostname, ip in workers ~}
-${ip} ansible_host=${ip} ansible_user=${user}
-%{ endfor ~}

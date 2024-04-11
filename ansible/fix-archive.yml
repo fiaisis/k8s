@@ -1,6 +1,0 @@
-- name: Archive mount is broke, fix it with this!
-  hosts: workers
-  vars_files:
-  - vars/vault.yml
-  roles:
-    - role: isis-archive

@@ -170,6 +170,8 @@ apiServer:
 addons:
   monitoring:
     enabled: false
+  ingress:
+    enabled: true
   openstack:
     enabled: true
     csiCinder:

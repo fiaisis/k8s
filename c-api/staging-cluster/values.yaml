@@ -176,10 +176,7 @@ addons:
   # https://github.com/stackhpc/capi-helm-charts/blob/main/charts/cluster-addons/README.md#monitoring-and-logging
   # and includes Loki which is required for central logging as per UKRI policy
   monitoring:
-    enabled: true
-    release:
-      namespace: ir
-      values: {}
+    enabled: false
   ingress:
     enabled: true
   openstack:
