@@ -1,0 +1,64 @@
+---
+- name: Mount the archive
+  become: true
+  block:
+    - name: Install cifs-utils and keyutils
+      apt:
+        update_cache: true
+        name: "{{item}}"
+        state: present
+      with_items:
+        - cifs-utils
+        - keyutils
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
+
+    - name: Create mountpoint
+      ansible.builtin.file:
+        path: /archive
+        state: directory
+        mode: "u=rwx,g=rx,o=rx"
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
+
+    - name: Ensure credentials file is present
+      ansible.builtin.lineinfile:
+        path: /archive.creds
+        search_string: "{{item}}"
+        line: "{{item}}"
+        create: true
+        mode: "u=rwx,g=,o="
+        state: present
+      with_items:
+        - username={{ isis_archive.username }}
+        - password={{ isis_archive.password }}
+        - domain={{ isis_archive.domain }}
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
+
+    - name: Ensure DNS config is setup for the archive
+      ansible.builtin.blockinfile:
+        path: /etc/systemd/resolved.conf
+        state: present
+        create: true
+        mode: "u=rw,g=r,o=r"
+        block: |
+          [Resolve]
+          Domains=isis.cclrc.ac.uk
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
+
+    - name: Restart resolved to ensure DNS configuration is up to date
+      ansible.builtin.service:
+        name: systemd-resolved.service
+        state: restarted
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
+
+    - name: Ensure mount is configured
+      ansible.builtin.mount:
+        path: /archive
+        src: "//isis.cclrc.ac.uk/inst$/"
+        fstype: cifs
+        opts: "noserverino,vers=2.1,credentials=/archive.creds,_netdev"
+        state: mounted
+      retries: 100
+      delay: 1
+      register: result
+      until: result.failed == false
+      when: "'workers' in group_names or inventory_hostname == 'localhost'"
