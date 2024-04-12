@@ -24,61 +24,8 @@ Start minikube
 minikube start
 ```
 
-Configure local cluster to create management cluster
-
-```bash
-clusterctl init --infrastructure openstack
-
-cd management-cluster
-export CLUSTER_NAME="management"
-
-kubectl create namespace clusters
-
-helm repo add capi https://stackhpc.github.io/capi-helm-charts
-helm repo add capi-addons https://stackhpc.github.io/cluster-api-addon-provider
-helm repo update
-
-helm upgrade cluster-api-addon-provider capi-addons/cluster-api-addon-provider --install --wait -n clusters --version 0.3.1
-
-helm upgrade $CLUSTER_NAME capi/openstack-cluster --install -f values.yaml -f clouds.yaml -f user-values.yaml -f flavors.yaml -n clusters
-cd ..
-```
-
-Wait for the above to finish by running this command and waiting for the cluster to report as "Ready: True":
-
-```bash
-watch clusterctl describe cluster -n clusters $CLUSTER_NAME
-```
-
-## Migrate to management cluster from local
-
-Now that the manegement cluster exists we should ensure that it is managed by itself and not a local cluster on our dev machine. Run the following:
-
-```bash
-clusterctl get kubeconfig $CLUSTER_NAME -n clusters > "kubeconfig-$CLUSTER_NAME"
-clusterctl init --infrastructure openstack --kubeconfig="kubeconfig-$CLUSTER_NAME"
-clusterctl move --to-kubeconfig "kubeconfig-$CLUSTER_NAME"
-```
-
-This management cluster will also need the cluster-api-addon-provider so install that now.
-
-```bash
-kubectl create namespace clusters --kubeconfig "kubeconfig-$CLUSTER_NAME"
-helm upgrade cluster-api-addon-provider capi-addons/cluster-api-addon-provider --install --wait -n clusters --version 0.3.1
-helm upgrade $CLUSTER_NAME capi/openstack-cluster --install -f values.yaml -f clouds.yaml -f user-values.yaml -f flavors.yaml --wait -n clusters
-```
-
-Wait for the migration to complete by waiting for the following to report as complete:
-
-```bash
-kubectl get kubeadmcontrolplane --kubeconfig=kubeconfig-$CLUSTER_NAME
-```
-
-Now that we are done with that migration you probably want to run the following command to change your kubeconfig file:
-
-```bash
-export KUBECONFIG="<path/to/kubeconfig-$CLUSTER_NAME>"
-```
+Follow this:
+https://stfc.atlassian.net/wiki/spaces/CLOUDKB/pages/211878034/Cluster+API+Setup#Moving-the-control-plane
 
 ## Staging cluster setup using management
 
@@ -140,17 +87,17 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 
 Setup ArgoCD CLI: https://argo-cd.readthedocs.io/en/stable/getting_started/#2-download-argo-cd-cli
 
-Create the Service type load balancer:
-```shell
-kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
-```
-
 Get the initial password:
 ```shell
 argocd admin initial-password -n argocd
 ```
 
-Login to the UI using the IP provided by the ArgoCD load balancer this will be an IP inside the firewall. The username is admin, and the password you already have.
+Portforward the UI to port 8080 using this command, allowing temporary access on http://localhost:8080:
+```shell
+kubectl port-forward service/argocd-server 80:8080 --namespace=argocd
+```
+
+Login to the UI, the username is admin, and the password you already have.
 
 Change the password using the user settings to the one in Keeper so everyone who needs the password has it available.
 
@@ -186,6 +133,6 @@ argocd --port-forward --port-forward-namespace=argocd cluster add prod --yes
 
 Once you've done this, change the name of the cluster in the UI to just `prod` instead of the long context name.
 
-Then follow the rest of the instructions in the gitops repo for adding the app of apps. These can be found [here](https://github.com/interactivereduction/gitops/blob/main/README.md#how-to-deploy-the-app-of-apps).
+Then follow the rest of the instructions in the gitops repo for adding the app of apps. These can be found [here](https://github.com/fiaisis/gitops/blob/main/README.md#how-to-deploy-the-app-of-apps).
 
 Don't forget to update the sealed secrets in for every app for the new clusters! 

@@ -141,26 +141,14 @@ kubeNetwork:
   # internal net on 172.16.x.y
   pods:
     cidrBlocks:
-      - 10.0.0.0/12
+      - 10.0.0.0/13
   services:
     cidrBlocks:
-      - 10.7.0.0/13
+      - 10.8.0.0/13
   serviceDomain: cluster.local
-
-# Settings for the OpenStack networking for the cluster
-clusterNetworking:
-  # Custom nameservers to use for the hosts
-  dnsNameservers:
-    - 130.246.209.132
-    - 130.246.209.163
-    - 130.246.208.220
-  externalNetworkId: External
 
 # Settings for registry mirrors
 registryMirrors: { docker.io: ["https://dockerhub.stfc.ac.uk"] }
-
-# List of additional packages to install on cluster nodes
-additionalPackages: [nfs-common, open-iscsi]
 
 # Settings for the Kubernetes API server
 apiServer:
@@ -172,13 +160,16 @@ apiServer:
   port: 6443
 
 addons:
-  # Enable monitoring by default, this deploys
-  # https://github.com/stackhpc/capi-helm-charts/blob/main/charts/cluster-addons/README.md#monitoring-and-logging
-  # and includes Loki which is required for central logging as per UKRI policy
   monitoring:
     enabled: false
   ingress:
     enabled: true
+    nginx:
+      release:
+        values:
+          controller:
+            service:
+              loadBalancerIP: "130.246.81.122"
   openstack:
     enabled: true
   cni:

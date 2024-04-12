@@ -5,3 +5,4 @@ haproxy.cfg
 *clouds*.yaml
 
 .idea
+*.kubeconfig
