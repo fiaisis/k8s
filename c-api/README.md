@@ -65,6 +65,7 @@ This management cluster will also need the cluster-api-addon-provider so install
 ```bash
 kubectl create namespace clusters --kubeconfig "kubeconfig-$CLUSTER_NAME"
 helm upgrade cluster-api-addon-provider capi-addons/cluster-api-addon-provider --install --wait -n clusters --version 0.3.1
+helm upgrade $CLUSTER_NAME capi/openstack-cluster --install -f values.yaml -f clouds.yaml -f user-values.yaml -f flavors.yaml --wait -n clusters
 ```
 
 Wait for the migration to complete by waiting for the following to report as complete:

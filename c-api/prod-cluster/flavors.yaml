@@ -8,7 +8,7 @@ nodeGroups:
 
 nodeGroupDefaults:
   autoscale: false
-  machineFlavor: l2.tiny
+  machineFlavor: l3.tiny
 
   healthCheck:
     enabled: true

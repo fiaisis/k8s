@@ -3,12 +3,12 @@
 # The worker node groups for the cluster
 nodeGroups:
   - name: worker
-    machineFlavor: l2.tiny
+    machineFlavor: l3.tiny
     machineCount: 3
 
 nodeGroupDefaults:
   autoscale: false
-  machineFlavor: l2.tiny
+  machineFlavor: l3.tiny
 
   healthCheck:
     enabled: true
