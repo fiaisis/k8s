@@ -4,7 +4,7 @@
 nodeGroups:
   - name: worker
     machineFlavor: l6.c124
-    machineCount: 5
+    machineCount: 4
 
 nodeGroupDefaults:
   autoscale: false
