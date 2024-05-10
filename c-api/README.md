@@ -82,7 +82,7 @@ kubectl config use-context management
 Install ArgoCD:
 ```shell
 kubectl create namespace argocd
-kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+helm install argocd argo/argo-cd --version 6.7.18 --namespace argocd
 ```
 
 Setup ArgoCD CLI: https://argo-cd.readthedocs.io/en/stable/getting_started/#2-download-argo-cd-cli
