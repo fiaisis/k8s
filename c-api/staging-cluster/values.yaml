@@ -1,4 +1,3 @@
-global:
 # The PEM-encoded CA certificate for openstack.stfc.ac.uk
 # this expires 2023-12-05T23:59:59Z (UTC)
 # This allows a user to skip adding verify: false
@@ -147,6 +146,10 @@ kubeNetwork:
       - 10.8.0.0/13
   serviceDomain: cluster.local
 
+clusterNetworking:
+  internalNetwork:
+    nodeCidr: 192.168.128.0/17
+
 # Settings for registry mirrors
 registryMirrors: { docker.io: ["https://dockerhub.stfc.ac.uk"] }
 
@@ -160,23 +163,13 @@ apiServer:
   port: 6443
 
 addons:
+  # Enable monitoring by default, this deploys
+  # https://github.com/stackhpc/capi-helm-charts/blob/main/charts/cluster-addons/README.md#monitoring-and-logging
+  # and includes Loki which is required for central logging as per UKRI policy
   monitoring:
-    enabled: false
-  ingress:
     enabled: true
-    nginx:
-      release:
-        values:
-          controller:
-            service:
-              loadBalancerIP: "130.246.81.122"
+  # set availabilty zone as upstream uses nova by default
   openstack:
-    enabled: true
-  cni:
-    type: cilium
-  nodeFeatureDiscovery:
-    enabled: false
-  mellanoxNetworkOperator:
-    enabled: false
-  nvidiaGPUOperator:
-    enabled: false
+    csiCinder:
+      defaultStorageClass:
+        availabilityZone: ceph
