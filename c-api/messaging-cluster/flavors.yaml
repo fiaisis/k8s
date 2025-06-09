@@ -3,18 +3,12 @@
 # The worker node groups for the cluster
 nodeGroups:
   - name: worker
-    machineFlavor: l3.tiny
-    machineCount: 5
-  - name: big-workers
-    machineFlavor: l3.medium
-    machineCount: 1
-  - name: gpu-worker
-    machineFlavor: g-a100-80gb-2022.x1
-    machineCount: 1
+    machineFlavor: l3.nano
+    machineCount: 4
 
 nodeGroupDefaults:
   autoscale: false
-  machineFlavor: l3.tiny
+  machineFlavor: l3.nano
 
   healthCheck:
     enabled: true

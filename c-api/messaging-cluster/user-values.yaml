@@ -3,7 +3,7 @@
 # to be used by the cluster. If this is not set, a new floating IP will be
 # allocated for the cluster each time it is created and clusters cannot .
 apiServer:
-  floatingIP: "130.246.214.191"
+  floatingIP: "130.246.80.191"
 
 # --------------------------- Optional Values -------------------------
 # List of comma separated additional packages to install on cluster nodes
@@ -20,9 +20,9 @@ controlPlane:
 # The Kubernetes version of the cluster
 # This should match the version of kubelet and kubeadm in the image
 # and will be automatically updated by us
-kubernetesVersion: "1.32.4"
+kubernetesVersion: "1.30.6"
 # The name of the image to use for cluster machines
-machineImage: "capi-ubuntu-2204-kube-v1.32.4-2025-05-02"
+machineImage: "capi-ubuntu-2204-kube-v1.30.6-2024-11-15"
 
 # Settings for node-level registry auth if using a private registry
 registryAuth:
@@ -44,8 +44,11 @@ addons:
       release:
         values:
           controller:
+            extraArgs:
+              tcp-services-configmap: "ingress-nginx/tcp-services"
             service:
-              loadBalancerIP: "130.246.81.122"
+              loadBalancerIP: "130.246.83.190"
+
   openstack:
     enabled: true
     csiCinder:

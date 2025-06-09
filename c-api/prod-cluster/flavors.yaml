@@ -3,8 +3,11 @@
 # The worker node groups for the cluster
 nodeGroups:
   - name: worker
-    machineFlavor: l6.c124
+    machineFlavor: l5.c124
     machineCount: 5
+  - name: gpu-worker
+    machineFlavor: g-a100-80gb-2022.x1
+    machineCount: 1
 
 nodeGroupDefaults:
   autoscale: false
