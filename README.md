@@ -16,9 +16,7 @@ terraform output ansible_inventory > ../ansible/ansible_inventory.ini
 
 Run the ansible playbook to setup redpanda from the ansible directory
 ```
-ansible-galaxy collection install redpanda.cluster
-export JSONDATA='{"cluster":{"auto_create_topics_enabled":"true"},"node":{"developer_mode":"false"}}'
-ansible-playbook ansible/playbooks/provision-cluster.yml --inventory=ansible_inventory.ini
+ansible-playbook redpanda.yml -i ansible-inventory.ini
 ```
 
 Ensure the redpanda console in the kubernetes cluster points at these brokers, this changes happens in the relevant app in the gitops repository.
