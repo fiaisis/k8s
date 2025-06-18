@@ -1,10 +1,37 @@
 ---
-- name: Download and execute script for adding repository
+- name: Remove dodgy repository
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/repository_egi_eu_sw_production_cas_1_current.list
+    state: absent
+
+- name: Update cache
+  become: true
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: ugrade all packages on Ubuntu
+  become: true
+  ansible.builtin.apt:
+    upgrade: yes
+
+- name: Download and import Redpanda GPG Key without proxy
+  become: true
+  args:
+    creates: /usr/share/keyrings/redpanda-redpanda-archive-keyring.gpg
   ansible.builtin.shell: |
-    curl -1sLf 'https://dl.redpanda.com/nzc4ZYQK3WRGd9sy/redpanda/cfg/setup/bash.deb.sh' | \
-    sudo -E bash
+    curl -1sLf "https://dl.redpanda.com/sMIXnoa7DK12JW4A/redpanda/gpg.988A7B0A4918BC85.key" | gpg --dearmor > /usr/share/keyrings/redpanda-redpanda-archive-keyring.gpg
+
+
+- name: Add Redpanda DEB repository
+  ansible.builtin.copy:
+    dest: "/etc/apt/sources.list.d/redpanda-redpanda.list"
+    content: "deb [signed-by=/usr/share/keyrings/redpanda-redpanda-archive-keyring.gpg] https://dl.redpanda.com/public/redpanda/deb/{{ansible_distribution | lower}} {{ ansible_distribution_release | lower }} main"
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Install redpanda
+  become: true
   ansible.builtin.apt:
     update_cache: yes
     name: redpanda
@@ -19,8 +46,8 @@
 - name: Bootstrap configuration
   ansible.builtin.shell: |
     sudo rpk redpanda config bootstrap --self 0.0.0.0 --ips 130.246.81.45,130.246.81.166,130.246.81.188
-    sudo rpk redpanda config set redpanda.empty_seed_starts_cluster false
-    sudo rpk redpanda config set redpanda.empty_seed_starts_cluster false
+    sudo rpk redpanda config set redpanda.empty_seed_starts_cluster true
+    sudo rpk redpanda config set redpanda.auto_create_topics_enabled true
 
 - name: Start redpanda
   ansible.builtin.systemd_service:
