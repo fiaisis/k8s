@@ -1,0 +1,6 @@
+---
+- name: Setup Redpanda Cluster
+  hosts: redpanda
+  become: true
+  roles:
+    - redpanda

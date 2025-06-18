@@ -1,0 +1,28 @@
+---
+- name: Download and execute script for adding repository
+  ansible.builtin.shell: |
+    curl -1sLf 'https://dl.redpanda.com/nzc4ZYQK3WRGd9sy/redpanda/cfg/setup/bash.deb.sh' | \
+    sudo -E bash
+
+- name: Install redpanda
+  ansible.builtin.apt:
+    update_cache: yes
+    name: redpanda
+    state: present
+
+- name: Tune kernel for prod
+  ansible.builtin.shell: |
+    sudo rpk redpanda mode production
+    sudo rpk redpanda tune all
+    sudo systemctl start redpanda-tuner
+
+- name: Bootstrap configuration
+  ansible.builtin.shell: |
+    sudo rpk redpanda config bootstrap --self 0.0.0.0 --ips 130.246.81.45,130.246.81.166,130.246.81.188
+    sudo rpk redpanda config set redpanda.empty_seed_starts_cluster false
+    sudo rpk redpanda config set redpanda.empty_seed_starts_cluster false
+
+- name: Start redpanda
+  ansible.builtin.systemd_service:
+    state: started
+    name: redpanda

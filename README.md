@@ -1,3 +1,29 @@
+# Redpanda deployment
+
+Requirements
+------------
+- Access to the STFC cloud via an openstack account
+- Ansible
+- Terraform
+
+If you do have not setup the keypair in the terrafrom file `redpanda.tf` then please do so, and ensure the nodes are using that keypair.
+
+In the terraform dir execute
+```
+terraform apply
+terraform output ansible_inventory > ../ansible/ansible_inventory.ini
+```
+
+Run the ansible playbook to setup redpanda from the ansible directory
+```
+ansible-galaxy collection install redpanda.cluster
+export JSONDATA='{"cluster":{"auto_create_topics_enabled":"true"},"node":{"developer_mode":"false"}}'
+ansible-playbook ansible/playbooks/provision-cluster.yml --inventory=ansible_inventory.ini
+```
+
+Ensure the redpanda console in the kubernetes cluster points at these brokers, this changes happens in the relevant app in the gitops repository.
+
+
 # Kubernetes deployment for IR
 
 Requirements

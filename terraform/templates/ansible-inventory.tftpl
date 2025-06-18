@@ -1,0 +1,4 @@
+[redpanda]
+%{ for hostname, ip in redpanda ~}
+${ip} ansible_host=${ip} ansible_user=${user} ansible_become=True private_ip=${ip}
+%{ endfor ~}
