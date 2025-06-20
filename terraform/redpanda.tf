@@ -39,6 +39,38 @@ resource "openstack_compute_servergroup_v2" "redpanda-group" {
 }
 
 ######################################################################################################
+# Networking
+######################################################################################################
+
+data "openstack_networking_network_v2" "external" {
+  name = "External"
+  network_id = "5283f642-8bd8-48b6-8608-fa3006ff4539"
+}
+
+resource "openstack_networking_network_v2" "redpanda" {
+  name           = "redpanda"
+  admin_state_up = "true"
+}
+
+resource "openstack_networking_subnet_v2" "redpanda" {
+  name       = "redpanda"
+  network_id = openstack_networking_network_v2.redpanda.id
+  cidr       = "192.168.199.0/24"
+  ip_version = 4
+}
+
+
+resource "openstack_networking_router_v2" "redpanda_router" {
+  name = "redpanda-router"
+  external_network_id = data.openstack_networking_network_v2.external.id
+}
+
+resource "openstack_networking_router_interface_v2" "redpanda_router_interface" {
+  router_id = openstack_networking_router_v2.redpanda_router.id
+  subnet_id = openstack_networking_subnet_v2.redpanda.id
+}
+
+######################################################################################################
 # Nodes - Redpanda
 ######################################################################################################
 
@@ -50,42 +82,12 @@ resource "openstack_compute_instance_v2" "redpanda" {
   security_groups = var.security_groups
   count = var.redpanda_count
   network {
-    name = "Internal"
+    # DO NOT USE "Internal"
+    name = "redpanda"
   }
   scheduler_hints {
         group = openstack_compute_servergroup_v2.redpanda-group.id 
     }
-}
-
-######################################################################################################
-# Networking
-######################################################################################################
-
-data "openstack_networking_network_v2" "internal" {
-  name = "Internal"
-  network_id = "5be315b7-7ebd-4254-97fe-18c1df501538"
-}
-
-data "openstack_networking_network_v2" "external" {
-  name = "External"
-  network_id = "5283f642-8bd8-48b6-8608-fa3006ff4539"
-}
-
-# This is now correctly linked to the 'Internal' network
-data "openstack_networking_subnet_v2" "internal_subnet" {
-  name       = "Internal1"
-  network_id = data.openstack_networking_network_v2.internal.id
-  cidr       = "172.16.100.0/22"
-}
-
-resource "openstack_networking_router_v2" "redpanda_router" {
-  name = "redpanda-router"
-  external_network_id = data.openstack_networking_network_v2.external.id
-}
-
-resource "openstack_networking_router_interface_v2" "redpanda_router_interface" {
-  router_id = openstack_networking_router_v2.redpanda_router.id
-  subnet_id = data.openstack_networking_subnet_v2.internal_subnet.id
 }
 
 ######################################################################################################
@@ -107,7 +109,7 @@ output "ansible_inventory" {
     "${path.module}/templates/ansible-inventory.tftpl",
     {
         user = openstack_compute_keypair_v2.keypair.name,
-        redpanda = openstack_compute_instance_v2.redpanda.*.access_ip_v4
+        redpanda = var.redpanda_floating_ips.*
     }
   )
 }
