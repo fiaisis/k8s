@@ -1,16 +1,4 @@
 ---
-- name: Give ssh access to Keiran
-  ansible.posix.authorized_key:
-    user: vxw59196
-    state: present
-    key: "{{ lookup('file', 'ssh-keys/keiran_id_rsa.pub') }}"
-
-- name: Give ssh access to Sam J
-  ansible.posix.authorized_key:
-    user: vxw59196
-    state: present
-    key: "{{ lookup('file', 'ssh-keys/sam_id_rsa.pub') }}"
-
 - name: Remove dodgy repository
   ansible.builtin.file:
     path: /etc/apt/sources.list.d/repository_egi_eu_sw_production_cas_1_current.list
