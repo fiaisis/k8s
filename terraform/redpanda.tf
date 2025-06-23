@@ -25,8 +25,8 @@ variable "redpanda_floating_ips" {
 ######################################################################################################
 
 resource "openstack_compute_keypair_v2" "keypair" {
-  name = "vxw59196" # Use fedID as this is reused in the k0sctl definition at the bottom
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDE973x4riglYeO/8QRF2Pbr0rb7W4Q40apqJf1UUnBnKZ04wPmPq9R+20JDt/YpX4i+Nfxv8peFu6+wqrdHLbNWTnQoUq+jWGass5MzadWhaW8Bc8BRuMgCx3dBxLnHKAH9Lrr9PKhY99w2573B8sb5SdJKDJQMCqjpVlQKtgOaJEHZ3iE9eBKDj0z+FveIpA/huLFPXeLmYc3u/DpGgkc59x5xnLPuh4Va0IJ+9DEsru5NYFLVACVW8QsNozWYONs/2xUjO4uL1Ue5wfFoRWU87lgJ8YZNXj1aszrJD4i51cD8Zar1dbHc2CHMDF0oyJBpXd6IfN4F5R4MUVizmtD samuel.jones@stfc.ac.uk"
+  name = "service-key" # Use fedID as this is reused in the k0sctl definition at the bottom
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC2xwcH2xtljOH20tzornv5J5oezBs7/co0GSLZiXpldx4Zhp9kwHQ+/exFoCBMmQQ0DvNSKHBt3KunIOWyJSmPl3+4wRQAqoL/uaUWYZbVfNjG4gQzVxf8TXutsw6DhrKpwBRduzYU9OGvYFRtvS59PKkEyj2UJf3BGkOKAYU2MR8UdE6Stxu5FcnATMCgyrLc1RkPPvSuKvF3a7+TuKKzhRP3zT+ysHAp5scCc8tIjq5+mjS+s538VW8z/hMORWADLOMmJMceOyWTYScZE0tFZc0Jdn8LrnRDYHp36RFZziFCHpfNwrMg+uXOCsmObx425dNcDPVkkMCiT/a7Tp09 Generated-by-Nova"
 }
 
 ######################################################################################################
