@@ -55,11 +55,22 @@
     sudo rpk redpanda tune all
     sudo systemctl start redpanda-tuner
 
-- name: Bootstrap configuration
+- name: Bootstrap seed server configuration
   ansible.builtin.shell: |
     sudo rpk redpanda config bootstrap --self 0.0.0.0 --ips 130.246.81.45,130.246.81.166,130.246.81.188
     sudo rpk redpanda config set redpanda.empty_seed_starts_cluster true
     sudo rpk redpanda config set redpanda.auto_create_topics_enabled true
+
+- name: Configure advertised Kafka API
+  ansible.builtin.shell: |
+    sudo rpk redpanda config set redpanda.kafka_api '[{ "address": "0.0.0.0", "port": 9092 }]'
+    sudo rpk redpanda config set redpanda.advertised_kafka_api '[{ "address": "{{ ansible_host }}", "port": 9092 }]'
+
+- name: Restart Redpanda
+  ansible.builtin.systemd:
+    name: redpanda
+    state: restarted
+    enabled: true
 
 - name: Start redpanda
   ansible.builtin.systemd_service:
