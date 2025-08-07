@@ -3,7 +3,7 @@ redpanda:
     empty_seed_starts_cluster: false
     seed_servers:
         - host:
-            address: 130.246.81.45
+            address: 130.246.81.166
             port: 33145
 
     rpc_server:
@@ -16,10 +16,10 @@ redpanda:
         - address: 0.0.0.0
           port: 9644
     advertised_rpc_api:
-        address: 130.246.81.188
+        address: 130.246.80.191
         port: 33145
     advertised_kafka_api:
-        - address: 130.246.81.188
+        - address: 130.246.80.191
           port: 9092
     auto_create_topics_enabled: true
 rpk:

@@ -11,7 +11,7 @@ If you do have not setup the keypair in the terrafrom file `redpanda.tf` then pl
 In the terraform dir execute
 ```
 terraform apply
-terraform output ansible_inventory > ../ansible/ansible_inventory.ini
+terraform output ansible_inventory > ../ansible/ansible-inventory.ini
 ```
 
 Run the ansible playbook to setup redpanda from the ansible directory
@@ -22,7 +22,7 @@ ansible-playbook redpanda.yml -i ansible-inventory.ini
 Ensure the redpanda console in the kubernetes cluster points at these brokers, this changes happens in the relevant app in the gitops repository.
 
 
-# Kubernetes deployment for IR
+# Kubernetes deployment for FIA
 
 Requirements
 -------------
