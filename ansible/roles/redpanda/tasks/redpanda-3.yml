@@ -1,0 +1,38 @@
+redpanda:
+    data_directory: /var/lib/redpanda/data
+    empty_seed_starts_cluster: false
+    seed_servers:
+        - host:
+            address: 130.246.81.45
+            port: 33145
+
+    rpc_server:
+        address: 0.0.0.0
+        port: 33145
+    kafka_api:
+        - address: 0.0.0.0
+          port: 9092
+    admin:
+        - address: 0.0.0.0
+          port: 9644
+    advertised_rpc_api:
+        address: 130.246.81.188
+        port: 33145
+    advertised_kafka_api:
+        - address: 130.246.81.188
+          port: 9092
+    auto_create_topics_enabled: true
+rpk:
+    tune_network: true
+    tune_disk_scheduler: true
+    tune_disk_nomerges: true
+    tune_disk_write_cache: true
+    tune_disk_irq: true
+    tune_cpu: true
+    tune_aio_events: true
+    tune_clocksource: true
+    tune_swappiness: true
+    coredump_dir: /var/lib/redpanda/coredump
+    tune_ballast_file: true
+pandaproxy: {}
+schema_registry: {}
