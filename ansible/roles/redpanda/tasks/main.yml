@@ -60,7 +60,7 @@
   delegate_to: 130.246.81.166
 
 - name: Bootstrap server 2 configuration
-  delegate_to: 130.246.81.166
+  delegate_to: 130.246.81.188
   ansible.builtin.shell: |
     sudo rpk redpanda config bootstrap --self 0.0.0.0 --ips 130.246.81.166,130.246.81.188,130.246.80.191
     sudo rpk redpanda config set redpanda.empty_seed_starts_cluster false
