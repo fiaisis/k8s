@@ -52,6 +52,8 @@
     sudo rpk redpanda config set redpanda.auto_create_topics_enabled true
     sudo rpk redpanda config set redpanda.kafka_api '[{ "address": "0.0.0.0", "port": 9092 }]'
     sudo rpk redpanda config set redpanda.advertised_kafka_api '[{ "address": "{{ ansible_host }}", "port": 9092 }]'
+    sudo rpk cluster config set kafka_batch_max_bytes 4294967295
+    
 
 - name: Copy server 0 Config
   ansible.builtin.copy:
@@ -67,6 +69,7 @@
     sudo rpk redpanda config set redpanda.auto_create_topics_enabled true
     sudo rpk redpanda config set redpanda.kafka_api '[{ "address": "0.0.0.0", "port": 9092 }]'
     sudo rpk redpanda config set redpanda.advertised_kafka_api '[{ "address": "{{ ansible_host }}", "port": 9092 }]'
+    sudo rpk cluster config set kafka_batch_max_bytes 4294967295
 
 - name: Copy server 2 config
   ansible.builtin.copy:
@@ -82,6 +85,7 @@
     sudo rpk redpanda config set redpanda.auto_create_topics_enabled true
     sudo rpk redpanda config set redpanda.kafka_api '[{ "address": "0.0.0.0", "port": 9092 }]'
     sudo rpk redpanda config set redpanda.advertised_kafka_api '[{ "address": "{{ ansible_host }}", "port": 9092 }]'
+    sudo rpk cluster config set kafka_batch_max_bytes 4294967295
 
 - name: Copy server 3 Config
   ansible.builtin.copy:
