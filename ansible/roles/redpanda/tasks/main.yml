@@ -9,7 +9,7 @@
   ansible.builtin.apt:
     update_cache: yes
 
-- name: ugrade all packages on Ubuntu
+- name: Upgrade all packages on Ubuntu
   become: true
   ansible.builtin.apt:
     upgrade: yes
@@ -43,16 +43,55 @@
     sudo rpk redpanda tune all
     sudo systemctl start redpanda-tuner
 
+
 - name: Bootstrap seed server configuration
+  delegate_to: 130.246.81.166
   ansible.builtin.shell: |
-    sudo rpk redpanda config bootstrap --self 0.0.0.0 --ips 130.246.81.45,130.246.81.166,130.246.81.188
+    sudo rpk redpanda config bootstrap --self 0.0.0.0 --ips 130.246.81.166,130.246.81.188,130.246.80.191
     sudo rpk redpanda config set redpanda.empty_seed_starts_cluster true
     sudo rpk redpanda config set redpanda.auto_create_topics_enabled true
-
-- name: Configure advertised Kafka API
-  ansible.builtin.shell: |
     sudo rpk redpanda config set redpanda.kafka_api '[{ "address": "0.0.0.0", "port": 9092 }]'
     sudo rpk redpanda config set redpanda.advertised_kafka_api '[{ "address": "{{ ansible_host }}", "port": 9092 }]'
+    sudo rpk cluster config set kafka_batch_max_bytes 4294967295
+    
+
+- name: Copy server 0 Config
+  ansible.builtin.copy:
+    src: redpanda-0.yml
+    dest: /etc/redpanda/redpanda.yaml
+  delegate_to: 130.246.81.166
+
+- name: Bootstrap server 2 configuration
+  delegate_to: 130.246.81.188
+  ansible.builtin.shell: |
+    sudo rpk redpanda config bootstrap --self 0.0.0.0 --ips 130.246.81.166,130.246.81.188,130.246.80.191
+    sudo rpk redpanda config set redpanda.empty_seed_starts_cluster false
+    sudo rpk redpanda config set redpanda.auto_create_topics_enabled true
+    sudo rpk redpanda config set redpanda.kafka_api '[{ "address": "0.0.0.0", "port": 9092 }]'
+    sudo rpk redpanda config set redpanda.advertised_kafka_api '[{ "address": "{{ ansible_host }}", "port": 9092 }]'
+    sudo rpk cluster config set kafka_batch_max_bytes 4294967295
+
+- name: Copy server 2 config
+  ansible.builtin.copy:
+    src: redpanda-2.yml
+    dest: /etc/redpanda/redpanda.yaml
+  delegate_to: 130.246.81.188
+
+- name: Bootstrap server 3 configuration
+  delegate_to: 130.246.80.191
+  ansible.builtin.shell: |
+    sudo rpk redpanda config bootstrap --self 0.0.0.0 --ips 130.246.81.166,130.246.81.188,130.246.80.191
+    sudo rpk redpanda config set redpanda.empty_seed_starts_cluster false
+    sudo rpk redpanda config set redpanda.auto_create_topics_enabled true
+    sudo rpk redpanda config set redpanda.kafka_api '[{ "address": "0.0.0.0", "port": 9092 }]'
+    sudo rpk redpanda config set redpanda.advertised_kafka_api '[{ "address": "{{ ansible_host }}", "port": 9092 }]'
+    sudo rpk cluster config set kafka_batch_max_bytes 4294967295
+
+- name: Copy server 3 Config
+  ansible.builtin.copy:
+    src: redpanda-3.yml
+    dest: /etc/redpanda/redpanda.yaml
+  delegate_to: 130.246.80.191
 
 - name: Restart Redpanda
   ansible.builtin.systemd:
@@ -60,7 +99,7 @@
     state: restarted
     enabled: true
 
-- name: Start redpanda
-  ansible.builtin.systemd_service:
-    state: started
-    name: redpanda
+#- name: Start redpanda
+#  ansible.builtin.systemd_service:
+#    state: started
+#    name: redpanda
