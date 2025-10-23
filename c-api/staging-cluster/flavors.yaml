@@ -2,12 +2,9 @@
 
 # The worker node groups for the cluster
 nodeGroups:
-  - name: worker
-    machineFlavor: l3.tiny
-    machineCount: 5
-  - name: big-workers
+  - name: workers
     machineFlavor: l3.medium
-    machineCount: 1
+    machineCount: 4
   - name: gpu-worker
     machineFlavor: g-a100-80gb-2022.x1
     machineCount: 1
