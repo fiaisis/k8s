@@ -117,6 +117,11 @@ Login to the ArgoCD CLI:
 argocd --port-forward --port-forward-namespace=argocd login --username=admin --password="ARGOCD_ADMIN_PASSWORD"
 ```
 
+If you have already deployed argo and need to readd a cluster it's recommended to use this (as ArgoCD will change the base path):
+```bash
+argocd login management.reduce.isis.cclrc.ac.uk --grpc-web-root-path /argocd --grpc-web
+```
+
 Add cluster using CLI for staging:
 
 ```bash
