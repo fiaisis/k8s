@@ -20,9 +20,9 @@ controlPlane:
 # The Kubernetes version of the cluster
 # This should match the version of kubelet and kubeadm in the image
 # and will be automatically updated by us
-kubernetesVersion: "1.33.4"
+kubernetesVersion: "1.34.8"
 # The name of the image to use for cluster machines
-machineImage: "capi-ubuntu-2204-kube-v1.33.4-2025-08-27"
+machineImage: "capi-ubuntu-2204-kube-v1.34.8"
 
 # Settings for node-level registry auth if using a private registry
 registryAuth:
@@ -39,13 +39,7 @@ addons:
   monitoring:
     enabled: false
   ingress:
-    enabled: true
-    nginx:
-      release:
-        values:
-          controller:
-            service:
-              loadBalancerIP: "130.246.81.192"
+    enabled: false
   openstack:
     enabled: true
     csiCinder:
@@ -53,6 +47,6 @@ addons:
   nodeFeatureDiscovery:
     enabled: true
   mellanoxNetworkOperator:
-    enabled: true
+    enabled: false
   nvidiaGPUOperator:
     enabled: false
