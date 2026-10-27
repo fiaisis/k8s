@@ -3,6 +3,8 @@ kubeconfig*
 inventory*.ini
 haproxy.cfg
 *clouds*.yaml
+*vault*.yml
+ansible/vars/vault.yml
 
 .idea
 *.kubeconfig
