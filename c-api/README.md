@@ -140,4 +140,5 @@ Once you've done this, change the name of the cluster in the UI to just `prod` i
 
 Then follow the rest of the instructions in the gitops repo for adding the app of apps. These can be found [here](https://github.com/fiaisis/gitops/blob/main/README.md#how-to-deploy-the-app-of-apps).
 
-Don't forget to update the sealed secrets in for every app for the new clusters! 
+Don't forget to ensure the Vault Secrets Operator (`VaultConnection` and `VaultAuth` in `components/vault-config/`) is configured for the new clusters so `VaultStaticSecret` resources can sync secrets from Vault!
+
